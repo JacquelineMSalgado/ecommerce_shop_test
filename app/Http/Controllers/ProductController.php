@@ -152,6 +152,15 @@ class ProductController extends Controller
         return $cart;
     }
 
+    public function totalCart(){//funcion privada por que solo se va a utilizar aca
+        $cart = session()->get('cart');
+        $total = 0;
+        foreach($cart as $item){
+            $total += $item['total'];
+        }
+        return $total;
+    }
+
     public function removeItemToCart(Request $request) {
         if($request->id) {
             $cart = session()->get('cart');

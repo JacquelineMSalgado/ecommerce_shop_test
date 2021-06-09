@@ -14,44 +14,41 @@
                     <v-row>
                         <v-spacer></v-spacer>
                         <v-col v-for="(item, index) in products" :key="index" cols="12" sm="6" md="4">
-                            <v-card :loading="loading == item.id" class="mx-auto my-12" max-width="374">
-                                <template slot="progress">
-                                    <v-progress-linear color="primary" height="10" indeterminate></v-progress-linear>
-                                </template>
-
-                                <v-img height="250" :src="'data:image/png;base64,' + item.picture"></v-img>
-
-                                <v-card-title>{{ item.name }}</v-card-title>
-
-                                <v-card-text>
-                                    <v-row align="center" class="mx-0">
-                                        <v-rating :value="4.5" color="amber" dense half-increments readonly size="14"></v-rating>
-
-                                        <div class="grey--text ms-4"> 4.5 (413) </div>
-                                    </v-row>
-
-                                    <div class="my-4 text-subtitle-1"> ${{item.price}} USD • {{item.slug}} </div>
-
-                                    <!-- <div>{{item.description}}</div> -->
-                                </v-card-text>
-
-                                <v-divider class="mx-4"></v-divider>
-
-                                <v-card-actions class="justify-center">
-                                    <v-btn color="deep lighten-2" @click="goToSite('/product/' + item.slug)"> READ MORE </v-btn>
-                                    <v-btn v-if="!cartObject.hasOwnProperty(item.id)" depressed color="primary" elevation="2" @click="addCart(item.id)">       
-                                        <v-icon left> mdi-cart </v-icon> ADD TO CART 
-                                    </v-btn>
-                                    <template v-else>
-                                        <v-btn  depressed color="primary" elevation="2" @click="addCart(item.id)">       
-                                            <v-icon left> mdi-cart </v-icon> + 1
-                                        </v-btn>
-                                        <v-btn depressed text @click="deleteItemCart(item.id)">       
-                                            <v-icon left> mdi-delete </v-icon>
-                                        </v-btn>
+                            <v-hover v-slot="{ hover }" open-delay="200">
+                                <v-card :loading="loading == item.id" :elevation="hover ? 16 : 2" :class="'mx-auto my-12 ' + { 'on-hover': hover }" max-width="374">
+                                    <template slot="progress">
+                                        <v-progress-linear color="primary" height="10" indeterminate></v-progress-linear>
                                     </template>
-                                </v-card-actions>
-                            </v-card>
+
+                                    <v-img height="250" :src="'data:image/png;base64,' + item.picture">
+                                        <v-expand-transition>
+                                            <div v-if="hover" class="d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text" style="height: 30%;">
+                                                <v-card-actions class="justify-center">
+                                                    <v-btn color="deep lighten-2" :href="'/product/' + item.slug"> READ MORE </v-btn>
+                                                    <v-btn depressed color="success" elevation="2" @click="addCart(item.id)">       
+                                                        <v-icon left> mdi-cart </v-icon> ADD TO CART 
+                                                    </v-btn>
+                                                </v-card-actions>
+                                            </div>
+                                        </v-expand-transition>
+                                    </v-img>
+
+                                    <v-card-title>{{ item.name }}</v-card-title>
+
+                                    <v-card-text>
+                                        <v-btn v-if="cartObject.hasOwnProperty(item.id)" absolute color="orange" class="white--text" fab x-small right top>
+                                            {{cartObject[item.id].quantity}}
+                                        </v-btn>
+                                        <v-row align="center" class="mx-0">
+                                            <v-rating :value="4.5" color="amber" dense half-increments readonly size="14"></v-rating>
+
+                                            <div class="grey--text ms-4"> 4.5 (413) </div>
+                                        </v-row>
+
+                                        <div class="my-4 text-subtitle-1"> ${{item.price}} USD • {{item.slug}} </div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-hover>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -113,9 +110,6 @@
                 });
                 this.getCartContent();
             },
-            goToSite(route) {
-                window.location.href = route;
-            },
             getCartContent() {
                 axios.get('/api/productsCart').then(res=>{
                     this.cartObject = res.data;
@@ -130,3 +124,15 @@
         },
     }
 </script>
+
+<style scoped>
+    .v-card--reveal {
+        align-items: center;
+        bottom: 0;
+        justify-content: center;
+        opacity: 1;
+        position: absolute;
+        width: 100%;
+        background-color: rgb(250, 250, 250, 0.3);
+    }
+</style>

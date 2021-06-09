@@ -6,14 +6,16 @@
         <v-main id="home">
             <v-container fluid id="products">
                 <v-row class="mt-5">
-                    <v-col cols="6" md="4">
+                    <v-col cols="12" md="4">
                         <v-card class="pa-2" tile>
                             <v-hover v-slot="{ hover }">
                                 <v-card class="mx-auto" color="grey lighten-4" max-width="600">
                                     <v-img :aspect-ratio="16/9" :src="'data:image/png;base64,' + product.picture">
                                         <v-expand-transition>
-                                            <div v-if="hover" class="d-flex transition-fast-in-fast-out orange darken-2 v-card--reveal text-h2 white--text" style="height: 100%;">
-                                                $ {{product.price}}
+                                            <div v-if="hover" class="d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text" style="height: 30%;">
+                                                <v-btn depressed color="success" elevation="2" @click="addCart(product.id)">       
+                                                    <v-icon left> mdi-cart </v-icon> ADD TO CART 
+                                                </v-btn>
                                             </div>
                                         </v-expand-transition>
                                     </v-img>
@@ -39,20 +41,12 @@
                             <v-divider class="mx-4"></v-divider>
 
                             <v-card-actions class="justify-center">
-                                <v-btn color="primary" @click="goToSite('/checkout')" :disabled="cartNumber==0"> 
+                                <v-btn color="orange white--text" href="/checkout" :disabled="cartNumber==0"> 
                                     <v-icon left> mdi-check </v-icon> CHECK OUT 
                                 </v-btn>
-                                <v-btn v-if="!cartObject.hasOwnProperty(product.id)" depressed elevation="2" @click="addCart(product.id)">       
+                                <v-btn color="success" depressed elevation="2" @click="addCart(product.id)">       
                                     <v-icon left> mdi-cart </v-icon> ADD TO CART 
                                 </v-btn>
-                                <template v-else>
-                                    <v-btn  depressed elevation="2" @click="addCart(product.id)">       
-                                        <v-icon left> mdi-cart </v-icon> + 1
-                                    </v-btn>
-                                    <v-btn depressed @click="deleteItemCart(product.id)">       
-                                        <v-icon left> mdi-delete </v-icon>
-                                    </v-btn>
-                                </template>
                             </v-card-actions>
                         </v-card>
                     </v-col>
@@ -158,9 +152,6 @@
                 });
                 this.getCartContent();
             },
-            goToSite(route) {
-                window.location.href = route;
-            },
             getCartContent() {
                 axios.get('/api/productsCart').then(res=>{
                     this.cartObject = res.data;
@@ -176,13 +167,14 @@
     }
 </script>
 
-<style>
+<style scoped>
     .v-card--reveal {
         align-items: center;
         bottom: 0;
         justify-content: center;
-        opacity: .5;
+        opacity: 1;
         position: absolute;
         width: 100%;
+        background-color: rgb(250, 250, 250, 0.3);
     }
 </style>

@@ -1845,6 +1845,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _json_estados_municipios_json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../json/estados-municipios.json */ "./resources/json/estados-municipios.json");
 //
 //
 //
@@ -1876,10 +1877,166 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component check out mounted.');
     this.getCartContent();
+    this.states = Object.keys(_json_estados_municipios_json__WEBPACK_IMPORTED_MODULE_0__);
+  },
+  computed: {
+    years: function years() {
+      var year = new Date().getFullYear();
+      return Array.from({
+        length: year + 10 - year
+      }, function (value, index) {
+        return year + index;
+      });
+    },
+    months: function months() {
+      var months = [{
+        month: 'January',
+        value: '01'
+      }, {
+        month: 'February',
+        value: '02'
+      }, {
+        month: 'March',
+        value: '03'
+      }, {
+        month: 'April',
+        value: '04'
+      }, {
+        month: 'May',
+        value: '05'
+      }, {
+        month: 'June',
+        value: '06'
+      }, {
+        month: 'July',
+        value: '07'
+      }, {
+        month: 'August',
+        value: '08'
+      }, {
+        month: 'September',
+        value: '09'
+      }, {
+        month: 'October',
+        value: '10'
+      }, {
+        month: 'November',
+        value: '11'
+      }, {
+        month: 'December',
+        value: '12'
+      }];
+      return months;
+    }
   },
   data: function data() {
     return {
@@ -1912,22 +2069,99 @@ __webpack_require__.r(__webpack_exports__);
         value: 'actions',
         sortable: false,
         align: 'center'
-      }]
+      }],
+      total: 0,
+      rules: {
+        required: function required(value) {
+          return !!value || 'Required.';
+        },
+        counter: function counter(value) {
+          return value.length <= 20 || 'Max 20 characters';
+        },
+        email: function email(value) {
+          var pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return pattern.test(value) || 'Invalid e-mail.';
+        }
+      },
+      value: '',
+      numberCard: '',
+      state: '',
+      city: '',
+      states: [],
+      cities: [],
+      freeShipping: false,
+      shipping: 0,
+      enablePayment: false
     };
   },
   methods: {
-    getCartContent: function getCartContent() {
+    addCart: function addCart($id) {
       var _this = this;
 
+      this.loading = $id;
+      axios.get('/api/addItemCart/' + $id).then(function (res) {
+        if (res.status == 200) {
+          _this.loading = 0;
+          _this.snackbar = true;
+          _this.textSnackBar = 'You added the product correctly. Check to your cart.';
+        }
+      });
+      this.getCartContent();
+      this.callParent();
+    },
+    deleteItemCart: function deleteItemCart($id) {
+      var _this2 = this;
+
+      this.loading = $id;
+      axios.get('/api/removeItemCart/' + $id).then(function (res) {
+        if (res.status == 200) {
+          _this2.loading = 0;
+          _this2.snackbar = true;
+          _this2.textSnackBar = 'You delete the product correctly. Check to your cart.';
+        }
+      });
+      this.getCartContent();
+      this.callParent();
+    },
+    getCartContent: function getCartContent() {
+      var _this3 = this;
+
       axios.get('/api/productsCart').then(function (res) {
-        _this.cartObject = res.data;
-        _this.cartNumber = Object.keys(_this.cartObject).length;
-        _this.cartObjectJSON = Object.values(_this.cartObject);
+        _this3.cartObject = res.data;
+        _this3.cartNumber = Object.keys(_this3.cartObject).length;
+        _this3.cartObjectJSON = Object.values(_this3.cartObject);
+      });
+      axios.get('/api/totalCart').then(function (res) {
+        _this3.total = res.data;
+        _this3.freeShipping = _this3.total < 25 ? true : false;
+        _this3.shipping = _this3.total < 25 ? 5 : 0;
       });
       this.callChild();
     },
     callChild: function callChild() {
       this.$refs.childRef.getCartContent();
+    },
+    acceptNumber: function acceptNumber() {
+      var x = this.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+      this.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+    },
+    numberCardMask: function numberCardMask() {
+      var x = this.numberCard.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})(\d{0,4})(\d{0,4})/);
+      this.numberCard = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
+    },
+    getCities: function getCities(state) {
+      this.cities = _json_estados_municipios_json__WEBPACK_IMPORTED_MODULE_0__[state];
+    },
+    isNumber: function isNumber(evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+
+      if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        evt.preventDefault();
+        ;
+      } else {
+        return true;
+      }
     }
   }
 });
@@ -1945,9 +2179,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-//
-//
-//
 //
 //
 //
@@ -2067,9 +2298,6 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
-    goToSite: function goToSite(route) {
-      window.location.href = route;
-    },
     getCartContent: function getCartContent() {
       var _this4 = this;
 
@@ -2099,12 +2327,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -2253,9 +2475,6 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
       this.getCartContent();
-    },
-    goToSite: function goToSite(route) {
-      window.location.href = route;
     },
     getCartContent: function getCartContent() {
       var _this4 = this;
@@ -2437,6 +2656,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ["data"],
   mounted: function mounted() {
@@ -2474,6 +2696,23 @@ __webpack_require__.r(__webpack_exports__);
         value: 'actions',
         sortable: false,
         align: 'center'
+      }],
+      menuItems: [{
+        path: "/",
+        name: "product",
+        title: "HOME"
+      }, {
+        path: "/categories",
+        name: "us",
+        title: "CATEGORIES"
+      }, {
+        path: "/contact",
+        name: "resources",
+        title: "CONTACT"
+      }, {
+        path: "/login",
+        name: "login",
+        title: "LOG IN"
       }]
     };
   },
@@ -2505,9 +2744,6 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
       this.callParent();
-    },
-    goToSite: function goToSite(route) {
-      window.location.href = route;
     },
     getCartContent: function getCartContent() {
       var _this3 = this;
@@ -7069,10 +7305,10 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css& ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css&":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css& ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7086,7 +7322,55 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.v-card--reveal {\n    align-items: center;\n    bottom: 0;\n    justify-content: center;\n    opacity: .5;\n    position: absolute;\n    width: 100%;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.text-fiel-form[data-v-1b7f00f8] {\n    padding-top: 0;\n    padding-bottom: 0;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.v-card--reveal[data-v-939d41f2] {\n    align-items: center;\n    bottom: 0;\n    justify-content: center;\n    opacity: 1;\n    position: absolute;\n    width: 100%;\n    background-color: rgb(250, 250, 250, 0.3);\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css&":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.v-card--reveal[data-v-390b76bc] {\n    align-items: center;\n    bottom: 0;\n    justify-content: center;\n    opacity: 1;\n    position: absolute;\n    width: 100%;\n    background-color: rgb(250, 250, 250, 0.3);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -38122,23 +38406,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _CheckOutComponent_vue_vue_type_template_id_1b7f00f8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CheckOutComponent.vue?vue&type=template&id=1b7f00f8& */ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&");
+/* harmony import */ var _CheckOutComponent_vue_vue_type_template_id_1b7f00f8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true& */ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true&");
 /* harmony import */ var _CheckOutComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CheckOutComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _CheckOutComponent_vue_vue_type_style_index_0_id_1b7f00f8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css& */ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__.default)(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
   _CheckOutComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
-  _CheckOutComponent_vue_vue_type_template_id_1b7f00f8___WEBPACK_IMPORTED_MODULE_0__.render,
-  _CheckOutComponent_vue_vue_type_template_id_1b7f00f8___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _CheckOutComponent_vue_vue_type_template_id_1b7f00f8_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _CheckOutComponent_vue_vue_type_template_id_1b7f00f8_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "1b7f00f8",
   null
   
 )
@@ -38161,23 +38447,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _LandingPage_vue_vue_type_template_id_939d41f2___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LandingPage.vue?vue&type=template&id=939d41f2& */ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&");
+/* harmony import */ var _LandingPage_vue_vue_type_template_id_939d41f2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LandingPage.vue?vue&type=template&id=939d41f2&scoped=true& */ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&scoped=true&");
 /* harmony import */ var _LandingPage_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LandingPage.vue?vue&type=script&lang=js& */ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _LandingPage_vue_vue_type_style_index_0_id_939d41f2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css& */ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__.default)(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
   _LandingPage_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
-  _LandingPage_vue_vue_type_template_id_939d41f2___WEBPACK_IMPORTED_MODULE_0__.render,
-  _LandingPage_vue_vue_type_template_id_939d41f2___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _LandingPage_vue_vue_type_template_id_939d41f2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _LandingPage_vue_vue_type_template_id_939d41f2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "939d41f2",
   null
   
 )
@@ -38200,9 +38488,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ProductDetails_vue_vue_type_template_id_390b76bc___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProductDetails.vue?vue&type=template&id=390b76bc& */ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&");
+/* harmony import */ var _ProductDetails_vue_vue_type_template_id_390b76bc_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true& */ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true&");
 /* harmony import */ var _ProductDetails_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ProductDetails.vue?vue&type=script&lang=js& */ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=script&lang=js&");
-/* harmony import */ var _ProductDetails_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ProductDetails.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _ProductDetails_vue_vue_type_style_index_0_id_390b76bc_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css& */ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -38214,11 +38502,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
   _ProductDetails_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
-  _ProductDetails_vue_vue_type_template_id_390b76bc___WEBPACK_IMPORTED_MODULE_0__.render,
-  _ProductDetails_vue_vue_type_template_id_390b76bc___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ProductDetails_vue_vue_type_template_id_390b76bc_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _ProductDetails_vue_vue_type_template_id_390b76bc_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "390b76bc",
   null
   
 )
@@ -38443,53 +38731,53 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&":
-/*!***************************************************************************************************!*\
-  !*** ./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8& ***!
-  \***************************************************************************************************/
+/***/ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true&":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true& ***!
+  \***************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_template_id_1b7f00f8___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_template_id_1b7f00f8___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_template_id_1b7f00f8_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_template_id_1b7f00f8_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_template_id_1b7f00f8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckOutComponent.vue?vue&type=template&id=1b7f00f8& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_template_id_1b7f00f8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true&");
 
 
 /***/ }),
 
-/***/ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&":
-/*!*********************************************************************************************!*\
-  !*** ./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2& ***!
-  \*********************************************************************************************/
+/***/ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&scoped=true&":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&scoped=true& ***!
+  \*********************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_template_id_939d41f2___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_template_id_939d41f2___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_template_id_939d41f2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_template_id_939d41f2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_template_id_939d41f2___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LandingPage.vue?vue&type=template&id=939d41f2& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_template_id_939d41f2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LandingPage.vue?vue&type=template&id=939d41f2&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&scoped=true&");
 
 
 /***/ }),
 
-/***/ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&":
-/*!************************************************************************************************!*\
-  !*** ./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc& ***!
-  \************************************************************************************************/
+/***/ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true&":
+/*!************************************************************************************************************!*\
+  !*** ./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true& ***!
+  \************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_template_id_390b76bc___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_template_id_390b76bc___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_template_id_390b76bc_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_template_id_390b76bc_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_template_id_390b76bc___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductDetails.vue?vue&type=template&id=390b76bc& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_template_id_390b76bc_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true&");
 
 
 /***/ }),
@@ -38545,27 +38833,61 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&":
-/*!**************************************************************************************************!*\
-  !*** ./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css& ***!
-  \**************************************************************************************************/
+/***/ "./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css&":
+/*!*****************************************************************************************************************************!*\
+  !*** ./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css& ***!
+  \*****************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-style-loader/index.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductDetails.vue?vue&type=style&index=0&lang=css& */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&");
-/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_style_index_0_id_1b7f00f8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-style-loader/index.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css& */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_style_index_0_id_1b7f00f8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_style_index_0_id_1b7f00f8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ var __WEBPACK_REEXPORT_OBJECT__ = {};
-/* harmony reexport (unknown) */ for(const __WEBPACK_IMPORT_KEY__ in _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== "default") __WEBPACK_REEXPORT_OBJECT__[__WEBPACK_IMPORT_KEY__] = () => _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__[__WEBPACK_IMPORT_KEY__]
+/* harmony reexport (unknown) */ for(const __WEBPACK_IMPORT_KEY__ in _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_style_index_0_id_1b7f00f8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== "default") __WEBPACK_REEXPORT_OBJECT__[__WEBPACK_IMPORT_KEY__] = () => _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckOutComponent_vue_vue_type_style_index_0_id_1b7f00f8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[__WEBPACK_IMPORT_KEY__]
 /* harmony reexport (unknown) */ __webpack_require__.d(__webpack_exports__, __WEBPACK_REEXPORT_OBJECT__);
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&":
-/*!******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8& ***!
-  \******************************************************************************************************************************************************************************************************************************************/
+/***/ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css&":
+/*!***********************************************************************************************************************!*\
+  !*** ./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css& ***!
+  \***********************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_style_index_0_id_939d41f2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-style-loader/index.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css& */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_style_index_0_id_939d41f2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_style_index_0_id_939d41f2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ var __WEBPACK_REEXPORT_OBJECT__ = {};
+/* harmony reexport (unknown) */ for(const __WEBPACK_IMPORT_KEY__ in _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_style_index_0_id_939d41f2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== "default") __WEBPACK_REEXPORT_OBJECT__[__WEBPACK_IMPORT_KEY__] = () => _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LandingPage_vue_vue_type_style_index_0_id_939d41f2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[__WEBPACK_IMPORT_KEY__]
+/* harmony reexport (unknown) */ __webpack_require__.d(__webpack_exports__, __WEBPACK_REEXPORT_OBJECT__);
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css&":
+/*!**************************************************************************************************************************!*\
+  !*** ./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_id_390b76bc_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-style-loader/index.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css& */ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_id_390b76bc_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_id_390b76bc_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ var __WEBPACK_REEXPORT_OBJECT__ = {};
+/* harmony reexport (unknown) */ for(const __WEBPACK_IMPORT_KEY__ in _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_id_390b76bc_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== "default") __WEBPACK_REEXPORT_OBJECT__[__WEBPACK_IMPORT_KEY__] = () => _node_modules_vue_style_loader_index_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductDetails_vue_vue_type_style_index_0_id_390b76bc_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[__WEBPACK_IMPORT_KEY__]
+/* harmony reexport (unknown) */ __webpack_require__.d(__webpack_exports__, __WEBPACK_REEXPORT_OBJECT__);
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true&":
+/*!******************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=template&id=1b7f00f8&scoped=true& ***!
+  \******************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -38595,104 +38917,771 @@ var render = function() {
             "v-container",
             { attrs: { fluid: "", id: "products" } },
             [
-              _c("v-data-table", {
-                staticClass: "elevation-1",
-                attrs: {
-                  headers: _vm.headers,
-                  items: _vm.cartObjectJSON,
-                  "hide-default-footer": ""
-                },
-                scopedSlots: _vm._u(
-                  [
-                    {
-                      key: "item.picture",
-                      fn: function(ref) {
-                        var item = ref.item
-                        return [
-                          _c("v-list-item-avatar", [
-                            _c("img", {
-                              attrs: {
-                                src: "data:image/png;base64," + item.picture,
-                                alt: item.picture
-                              }
-                            })
-                          ])
-                        ]
-                      }
-                    },
-                    {
-                      key: "item.actions",
-                      fn: function(ref) {
-                        var item = ref.item
-                        return [
+              _c(
+                "v-row",
+                [
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "12", md: "8" } },
+                    [
+                      _c(
+                        "v-card",
+                        { staticClass: "pa-2", attrs: { tile: "" } },
+                        [
                           _c(
-                            "v-icon",
+                            "v-card-text",
                             {
-                              on: {
-                                click: function($event) {
-                                  return _vm.addCart(item.id)
+                              staticClass:
+                                "text-center black--text font-weight-black"
+                            },
+                            [_vm._v(" ITEMS IN YOUR CART ")]
+                          ),
+                          _vm._v(" "),
+                          _c("v-divider", { staticClass: "ma-2" }),
+                          _vm._v(" "),
+                          _c("v-data-table", {
+                            staticClass: "elevation-1 mb-5",
+                            attrs: {
+                              headers: _vm.headers,
+                              items: _vm.cartObjectJSON,
+                              "hide-default-footer": ""
+                            },
+                            scopedSlots: _vm._u(
+                              [
+                                {
+                                  key: "item.picture",
+                                  fn: function(ref) {
+                                    var item = ref.item
+                                    return [
+                                      _c("v-list-item", [
+                                        _c("img", {
+                                          attrs: {
+                                            src:
+                                              "data:image/png;base64," +
+                                              item.picture,
+                                            alt: item.picture,
+                                            width: "80vw"
+                                          }
+                                        })
+                                      ])
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "item.actions",
+                                  fn: function(ref) {
+                                    var item = ref.item
+                                    return [
+                                      _c(
+                                        "v-icon",
+                                        {
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.addCart(item.id)
+                                            }
+                                          }
+                                        },
+                                        [_vm._v(" mdi-plus ")]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-icon",
+                                        {
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.deleteItemCart(item.id)
+                                            }
+                                          }
+                                        },
+                                        [_vm._v(" mdi-delete ")]
+                                      )
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "item.price",
+                                  fn: function(ref) {
+                                    var item = ref.item
+                                    return [
+                                      _vm._v(
+                                        "\n                                $ " +
+                                          _vm._s(item.price) +
+                                          " USD\n                            "
+                                      )
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "item.total",
+                                  fn: function(ref) {
+                                    var item = ref.item
+                                    return [
+                                      _vm._v(
+                                        "\n                                $ " +
+                                          _vm._s(item.total) +
+                                          " USD\n                            "
+                                      )
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "no-data",
+                                  fn: function() {
+                                    return [
+                                      _vm._v(
+                                        "\n                                You don't have products added\n                            "
+                                      )
+                                    ]
+                                  },
+                                  proxy: true
                                 }
+                              ],
+                              null,
+                              true
+                            )
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                color: "orange white--text",
+                                disabled: _vm.enablePayment,
+                                href: "/"
                               }
                             },
-                            [_vm._v(" mdi-plus ")]
+                            [_vm._v(" CONTINUE SHOPPING ")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "12", md: "4" } },
+                    [
+                      _c(
+                        "v-card",
+                        { staticClass: "pa-2", attrs: { tile: "" } },
+                        [
+                          _c(
+                            "v-card-text",
+                            {
+                              staticClass:
+                                "text-center black--text font-weight-black"
+                            },
+                            [_vm._v(" ORDER SUMMARY ")]
+                          ),
+                          _vm._v(" "),
+                          _c("v-divider", { staticClass: "ma-2" }),
+                          _vm._v(" "),
+                          _c(
+                            "v-row",
+                            [
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "6", md: "6" } },
+                                [
+                                  _c(
+                                    "v-card-text",
+                                    { staticClass: "pb-0 pt-0" },
+                                    [_vm._v(" TOTAL QUANTITY:")]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                {
+                                  staticClass: "text-right",
+                                  attrs: { cols: "6", md: "6" }
+                                },
+                                [
+                                  _c(
+                                    "v-card-text",
+                                    { staticClass: "pb-0 pt-0" },
+                                    [_vm._v("$ " + _vm._s(_vm.total) + " USD")]
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
                           ),
                           _vm._v(" "),
                           _c(
-                            "v-icon",
-                            {
-                              on: {
-                                click: function($event) {
-                                  return _vm.deleteItemCart(item.id)
+                            "v-row",
+                            { staticClass: "mb-3" },
+                            [
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "6", md: "6" } },
+                                [
+                                  _c(
+                                    "v-card-text",
+                                    { staticClass: "pb-0 pt-0" },
+                                    [_vm._v(" SHIPPING: ")]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                {
+                                  staticClass: "text-right",
+                                  attrs: { cols: "6", md: "6" }
+                                },
+                                [
+                                  _c(
+                                    "v-card-text",
+                                    { staticClass: "pb-0 pt-0" },
+                                    [
+                                      _vm._v(
+                                        "$ " + _vm._s(_vm.shipping) + " USD "
+                                      )
+                                    ]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "6", md: "6" } },
+                                [
+                                  _c(
+                                    "v-card-text",
+                                    {
+                                      staticClass:
+                                        "pb-0 pt-0 error--text font-weight-bold"
+                                    },
+                                    [_vm._v(" TOTAL: ")]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                {
+                                  staticClass: "text-right",
+                                  attrs: { cols: "6", md: "6" }
+                                },
+                                [
+                                  _c(
+                                    "v-card-text",
+                                    {
+                                      staticClass:
+                                        "pb-0 pt-0 error--text font-weight-bold"
+                                    },
+                                    [
+                                      _vm._v(
+                                        "$ " +
+                                          _vm._s(_vm.total + _vm.shipping) +
+                                          " USD "
+                                      )
+                                    ]
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-col",
+                            { attrs: { cols: "12", md: "12" } },
+                            [
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: {
+                                    block: "",
+                                    color: _vm.enablePayment ? "" : "success",
+                                    disabled: _vm.cartNumber == 0
+                                  },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.enablePayment = !_vm.enablePayment
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("v-icon", { attrs: { left: "" } }, [
+                                    _vm._v("mdi-credit-card-check")
+                                  ]),
+                                  _vm._v(
+                                    " " +
+                                      _vm._s(
+                                        _vm.enablePayment ? "HIDE" : "ENABLE"
+                                      ) +
+                                      " SECURE PAYMENT "
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _vm.freeShipping
+                            ? _c(
+                                "v-card",
+                                {
+                                  staticClass: "pa-2",
+                                  attrs: { color: "grey lighten-4 rounded" }
+                                },
+                                [
+                                  _vm.freeShipping
+                                    ? _c(
+                                        "v-card-text",
+                                        { staticClass: "p-0 text-center" },
+                                        [
+                                          _c("v-icon", [_vm._v("mdi-truck")]),
+                                          _vm._v(
+                                            " You need $ " +
+                                              _vm._s(25 - _vm.total) +
+                                              " USD to get to the free shipping. "
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e()
+                                ],
+                                1
+                              )
+                            : _vm._e()
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _vm.enablePayment
+                ? _c(
+                    "v-row",
+                    [
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c(
+                            "v-card",
+                            { staticClass: "pa-2", attrs: { tile: "" } },
+                            [
+                              _c(
+                                "v-card-text",
+                                {
+                                  staticClass:
+                                    "text-center black--text font-weight-black"
+                                },
+                                [_vm._v(" INVOICING INFORMATION ")]
+                              ),
+                              _vm._v(" "),
+                              _c("v-divider", { staticClass: "ma-2" }),
+                              _vm._v(" "),
+                              _c(
+                                "v-card-text",
+                                [
+                                  _c(
+                                    "v-row",
+                                    { staticClass: "pb-0 pt-0" },
+                                    [
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "6" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "First Name",
+                                              rules: [_vm.rules.required],
+                                              "prepend-inner-icon":
+                                                "mdi-tooltip-account"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "6" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "Last Name",
+                                              rules: [_vm.rules.required]
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "7" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "Email",
+                                              hint: "user@email.com",
+                                              rules: [
+                                                _vm.rules.required,
+                                                _vm.rules.email
+                                              ],
+                                              "prepend-inner-icon": "mdi-email"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "5" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "Phone",
+                                              rules: [_vm.rules.required],
+                                              counter: "",
+                                              maxlength: "14",
+                                              "prepend-inner-icon": "mdi-phone"
+                                            },
+                                            on: {
+                                              keypress: function($event) {
+                                                return _vm.isNumber($event)
+                                              },
+                                              input: _vm.acceptNumber
+                                            },
+                                            model: {
+                                              value: _vm.value,
+                                              callback: function($$v) {
+                                                _vm.value = $$v
+                                              },
+                                              expression: "value"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "9" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "Address",
+                                              rules: [_vm.rules.required],
+                                              "prepend-inner-icon":
+                                                "mdi-home-city"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "6", md: "3" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "ZIP Code",
+                                              rules: [_vm.rules.required],
+                                              counter: "",
+                                              maxlength: "5"
+                                            },
+                                            on: {
+                                              keypress: function($event) {
+                                                return _vm.isNumber($event)
+                                              }
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "6" }
+                                        },
+                                        [
+                                          _c("v-autocomplete", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "State",
+                                              rules: [_vm.rules.required],
+                                              items: _vm.states,
+                                              clearable: "",
+                                              "prepend-inner-icon":
+                                                "mdi-map-marker"
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                return _vm.getCities(_vm.state)
+                                              }
+                                            },
+                                            model: {
+                                              value: _vm.state,
+                                              callback: function($$v) {
+                                                _vm.state = $$v
+                                              },
+                                              expression: "state"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "6" }
+                                        },
+                                        [
+                                          _c("v-autocomplete", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "City",
+                                              rules: [_vm.rules.required],
+                                              items: _vm.cities,
+                                              disabled: _vm.cities.length == 0,
+                                              clearable: "",
+                                              "prepend-inner-icon": "mdi-city"
+                                            },
+                                            model: {
+                                              value: _vm.city,
+                                              callback: function($$v) {
+                                                _vm.city = $$v
+                                              },
+                                              expression: "city"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      )
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "12", md: "6" } },
+                        [
+                          _c(
+                            "v-card",
+                            { staticClass: "pa-2", attrs: { tile: "" } },
+                            [
+                              _c(
+                                "v-card-text",
+                                {
+                                  staticClass:
+                                    "text-center black--text font-weight-black"
+                                },
+                                [_vm._v(" PAYMENT INFORMATION ")]
+                              ),
+                              _vm._v(" "),
+                              _c("v-divider", { staticClass: "ma-2" }),
+                              _vm._v(" "),
+                              _c("v-img", {
+                                attrs: {
+                                  src:
+                                    "https://www.fisioterapiaduque.com/wp-content/uploads/2020/11/pagos.png",
+                                  height: "7vh"
                                 }
-                              }
-                            },
-                            [_vm._v(" mdi-delete ")]
+                              }),
+                              _vm._v(" "),
+                              _c(
+                                "v-card-text",
+                                [
+                                  _c(
+                                    "v-row",
+                                    { staticClass: "mt-2" },
+                                    [
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "8" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "Card number",
+                                              rules: [_vm.rules.required],
+                                              maxlength: "19",
+                                              "append-icon":
+                                                "mdi-credit-card-settings-outline"
+                                            },
+                                            on: {
+                                              keypress: function($event) {
+                                                return _vm.isNumber($event)
+                                              },
+                                              input: _vm.numberCardMask
+                                            },
+                                            model: {
+                                              value: _vm.numberCard,
+                                              callback: function($$v) {
+                                                _vm.numberCard = $$v
+                                              },
+                                              expression: "numberCard"
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "4", md: "4" }
+                                        },
+                                        [
+                                          _c("v-text-field", {
+                                            attrs: {
+                                              outlined: "",
+                                              dense: "",
+                                              label: "CVV",
+                                              rules: [_vm.rules.required],
+                                              counter: "",
+                                              maxlength: "4",
+                                              minlength: "3"
+                                            },
+                                            on: {
+                                              keypress: function($event) {
+                                                return _vm.isNumber($event)
+                                              }
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "6" }
+                                        },
+                                        [
+                                          _c("v-select", {
+                                            attrs: {
+                                              dense: "",
+                                              items: _vm.months,
+                                              "item-text": "month",
+                                              label: "EXPIRATION MONTH",
+                                              outlined: ""
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-col",
+                                        {
+                                          staticClass: "py-0",
+                                          attrs: { cols: "12", md: "6" }
+                                        },
+                                        [
+                                          _c("v-select", {
+                                            attrs: {
+                                              dense: "",
+                                              items: _vm.years,
+                                              label: "EXPIRATION YEAR",
+                                              outlined: ""
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      )
+                                    ],
+                                    1
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-btn",
+                                    {
+                                      attrs: {
+                                        block: "",
+                                        color: "orange white--text"
+                                      }
+                                    },
+                                    [_vm._v("ORDER AND PAYMENT")]
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
                           )
-                        ]
-                      }
-                    },
-                    {
-                      key: "item.price",
-                      fn: function(ref) {
-                        var item = ref.item
-                        return [
-                          _vm._v(
-                            "\n                    $ " +
-                              _vm._s(item.price) +
-                              "\n                "
-                          )
-                        ]
-                      }
-                    },
-                    {
-                      key: "item.total",
-                      fn: function(ref) {
-                        var item = ref.item
-                        return [
-                          _vm._v(
-                            "\n                    $ " +
-                              _vm._s(item.total) +
-                              "\n                "
-                          )
-                        ]
-                      }
-                    },
-                    {
-                      key: "no-data",
-                      fn: function() {
-                        return [
-                          _vm._v(
-                            "\n                    You don't have products added\n                "
-                          )
-                        ]
-                      },
-                      proxy: true
-                    }
-                  ],
-                  null,
-                  true
-                )
-              })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e()
             ],
             1
           )
@@ -38712,10 +39701,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&":
-/*!************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2& ***!
-  \************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=template&id=939d41f2&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -38776,194 +39765,242 @@ var render = function() {
                             attrs: { cols: "12", sm: "6", md: "4" }
                           },
                           [
-                            _c(
-                              "v-card",
-                              {
-                                staticClass: "mx-auto my-12",
-                                attrs: {
-                                  loading: _vm.loading == item.id,
-                                  "max-width": "374"
-                                }
-                              },
-                              [
-                                _c(
-                                  "template",
-                                  { slot: "progress" },
-                                  [
-                                    _c("v-progress-linear", {
-                                      attrs: {
-                                        color: "primary",
-                                        height: "10",
-                                        indeterminate: ""
-                                      }
-                                    })
-                                  ],
-                                  1
-                                ),
-                                _vm._v(" "),
-                                _c("v-img", {
-                                  attrs: {
-                                    height: "250",
-                                    src: "data:image/png;base64," + item.picture
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("v-card-title", [_vm._v(_vm._s(item.name))]),
-                                _vm._v(" "),
-                                _c(
-                                  "v-card-text",
-                                  [
-                                    _c(
-                                      "v-row",
-                                      {
-                                        staticClass: "mx-0",
-                                        attrs: { align: "center" }
-                                      },
-                                      [
-                                        _c("v-rating", {
-                                          attrs: {
-                                            value: 4.5,
-                                            color: "amber",
-                                            dense: "",
-                                            "half-increments": "",
-                                            readonly: "",
-                                            size: "14"
-                                          }
-                                        }),
-                                        _vm._v(" "),
+                            _c("v-hover", {
+                              attrs: { "open-delay": "200" },
+                              scopedSlots: _vm._u(
+                                [
+                                  {
+                                    key: "default",
+                                    fn: function(ref) {
+                                      var hover = ref.hover
+                                      return [
                                         _c(
-                                          "div",
-                                          { staticClass: "grey--text ms-4" },
-                                          [_vm._v(" 4.5 (413) ")]
-                                        )
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "div",
-                                      { staticClass: "my-4 text-subtitle-1" },
-                                      [
-                                        _vm._v(
-                                          " $" +
-                                            _vm._s(item.price) +
-                                            " USD • " +
-                                            _vm._s(item.slug) +
-                                            " "
-                                        )
-                                      ]
-                                    )
-                                  ],
-                                  1
-                                ),
-                                _vm._v(" "),
-                                _c("v-divider", { staticClass: "mx-4" }),
-                                _vm._v(" "),
-                                _c(
-                                  "v-card-actions",
-                                  { staticClass: "justify-center" },
-                                  [
-                                    _c(
-                                      "v-btn",
-                                      {
-                                        attrs: { color: "deep lighten-2" },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.goToSite(
-                                              "/product/" + item.slug
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [_vm._v(" READ MORE ")]
-                                    ),
-                                    _vm._v(" "),
-                                    !_vm.cartObject.hasOwnProperty(item.id)
-                                      ? _c(
-                                          "v-btn",
+                                          "v-card",
                                           {
+                                            class:
+                                              "mx-auto my-12 " +
+                                              { "on-hover": hover },
                                             attrs: {
-                                              depressed: "",
-                                              color: "primary",
-                                              elevation: "2"
-                                            },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.addCart(item.id)
-                                              }
+                                              loading: _vm.loading == item.id,
+                                              elevation: hover ? 16 : 2,
+                                              "max-width": "374"
                                             }
                                           },
                                           [
                                             _c(
-                                              "v-icon",
-                                              { attrs: { left: "" } },
-                                              [_vm._v(" mdi-cart ")]
+                                              "template",
+                                              { slot: "progress" },
+                                              [
+                                                _c("v-progress-linear", {
+                                                  attrs: {
+                                                    color: "primary",
+                                                    height: "10",
+                                                    indeterminate: ""
+                                                  }
+                                                })
+                                              ],
+                                              1
                                             ),
-                                            _vm._v(
-                                              " ADD TO CART \n                                "
+                                            _vm._v(" "),
+                                            _c(
+                                              "v-img",
+                                              {
+                                                attrs: {
+                                                  height: "250",
+                                                  src:
+                                                    "data:image/png;base64," +
+                                                    item.picture
+                                                }
+                                              },
+                                              [
+                                                _c("v-expand-transition", [
+                                                  hover
+                                                    ? _c(
+                                                        "div",
+                                                        {
+                                                          staticClass:
+                                                            "d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text",
+                                                          staticStyle: {
+                                                            height: "30%"
+                                                          }
+                                                        },
+                                                        [
+                                                          _c(
+                                                            "v-card-actions",
+                                                            {
+                                                              staticClass:
+                                                                "justify-center"
+                                                            },
+                                                            [
+                                                              _c(
+                                                                "v-btn",
+                                                                {
+                                                                  attrs: {
+                                                                    color:
+                                                                      "deep lighten-2",
+                                                                    href:
+                                                                      "/product/" +
+                                                                      item.slug
+                                                                  }
+                                                                },
+                                                                [
+                                                                  _vm._v(
+                                                                    " READ MORE "
+                                                                  )
+                                                                ]
+                                                              ),
+                                                              _vm._v(" "),
+                                                              _c(
+                                                                "v-btn",
+                                                                {
+                                                                  attrs: {
+                                                                    depressed:
+                                                                      "",
+                                                                    color:
+                                                                      "success",
+                                                                    elevation:
+                                                                      "2"
+                                                                  },
+                                                                  on: {
+                                                                    click: function(
+                                                                      $event
+                                                                    ) {
+                                                                      return _vm.addCart(
+                                                                        item.id
+                                                                      )
+                                                                    }
+                                                                  }
+                                                                },
+                                                                [
+                                                                  _c(
+                                                                    "v-icon",
+                                                                    {
+                                                                      attrs: {
+                                                                        left: ""
+                                                                      }
+                                                                    },
+                                                                    [
+                                                                      _vm._v(
+                                                                        " mdi-cart "
+                                                                      )
+                                                                    ]
+                                                                  ),
+                                                                  _vm._v(
+                                                                    " ADD TO CART \n                                                "
+                                                                  )
+                                                                ],
+                                                                1
+                                                              )
+                                                            ],
+                                                            1
+                                                          )
+                                                        ],
+                                                        1
+                                                      )
+                                                    : _vm._e()
+                                                ])
+                                              ],
+                                              1
+                                            ),
+                                            _vm._v(" "),
+                                            _c("v-card-title", [
+                                              _vm._v(_vm._s(item.name))
+                                            ]),
+                                            _vm._v(" "),
+                                            _c(
+                                              "v-card-text",
+                                              [
+                                                _vm.cartObject.hasOwnProperty(
+                                                  item.id
+                                                )
+                                                  ? _c(
+                                                      "v-btn",
+                                                      {
+                                                        staticClass:
+                                                          "white--text",
+                                                        attrs: {
+                                                          absolute: "",
+                                                          color: "orange",
+                                                          fab: "",
+                                                          "x-small": "",
+                                                          right: "",
+                                                          top: ""
+                                                        }
+                                                      },
+                                                      [
+                                                        _vm._v(
+                                                          "\n                                        " +
+                                                            _vm._s(
+                                                              _vm.cartObject[
+                                                                item.id
+                                                              ].quantity
+                                                            ) +
+                                                            "\n                                    "
+                                                        )
+                                                      ]
+                                                    )
+                                                  : _vm._e(),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "v-row",
+                                                  {
+                                                    staticClass: "mx-0",
+                                                    attrs: { align: "center" }
+                                                  },
+                                                  [
+                                                    _c("v-rating", {
+                                                      attrs: {
+                                                        value: 4.5,
+                                                        color: "amber",
+                                                        dense: "",
+                                                        "half-increments": "",
+                                                        readonly: "",
+                                                        size: "14"
+                                                      }
+                                                    }),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "div",
+                                                      {
+                                                        staticClass:
+                                                          "grey--text ms-4"
+                                                      },
+                                                      [_vm._v(" 4.5 (413) ")]
+                                                    )
+                                                  ],
+                                                  1
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    staticClass:
+                                                      "my-4 text-subtitle-1"
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      " $" +
+                                                        _vm._s(item.price) +
+                                                        " USD • " +
+                                                        _vm._s(item.slug) +
+                                                        " "
+                                                    )
+                                                  ]
+                                                )
+                                              ],
+                                              1
                                             )
                                           ],
-                                          1
+                                          2
                                         )
-                                      : [
-                                          _c(
-                                            "v-btn",
-                                            {
-                                              attrs: {
-                                                depressed: "",
-                                                color: "primary",
-                                                elevation: "2"
-                                              },
-                                              on: {
-                                                click: function($event) {
-                                                  return _vm.addCart(item.id)
-                                                }
-                                              }
-                                            },
-                                            [
-                                              _c(
-                                                "v-icon",
-                                                { attrs: { left: "" } },
-                                                [_vm._v(" mdi-cart ")]
-                                              ),
-                                              _vm._v(
-                                                " + 1\n                                    "
-                                              )
-                                            ],
-                                            1
-                                          ),
-                                          _vm._v(" "),
-                                          _c(
-                                            "v-btn",
-                                            {
-                                              attrs: {
-                                                depressed: "",
-                                                text: ""
-                                              },
-                                              on: {
-                                                click: function($event) {
-                                                  return _vm.deleteItemCart(
-                                                    item.id
-                                                  )
-                                                }
-                                              }
-                                            },
-                                            [
-                                              _c(
-                                                "v-icon",
-                                                { attrs: { left: "" } },
-                                                [_vm._v(" mdi-delete ")]
-                                              )
-                                            ],
-                                            1
-                                          )
-                                        ]
-                                  ],
-                                  2
-                                )
-                              ],
-                              2
-                            )
+                                      ]
+                                    }
+                                  }
+                                ],
+                                null,
+                                true
+                              )
+                            })
                           ],
                           1
                         )
@@ -39035,10 +40072,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&":
-/*!***************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc& ***!
-  \***************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true&":
+/*!***************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=template&id=390b76bc&scoped=true& ***!
+  \***************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -39074,7 +40111,7 @@ var render = function() {
                 [
                   _c(
                     "v-col",
-                    { attrs: { cols: "6", md: "4" } },
+                    { attrs: { cols: "12", md: "4" } },
                     [
                       _c(
                         "v-card",
@@ -39114,20 +40151,52 @@ var render = function() {
                                                     "div",
                                                     {
                                                       staticClass:
-                                                        "d-flex transition-fast-in-fast-out orange darken-2 v-card--reveal text-h2 white--text",
+                                                        "d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text",
                                                       staticStyle: {
-                                                        height: "100%"
+                                                        height: "30%"
                                                       }
                                                     },
                                                     [
-                                                      _vm._v(
-                                                        "\n                                            $ " +
-                                                          _vm._s(
-                                                            _vm.product.price
-                                                          ) +
-                                                          "\n                                        "
+                                                      _c(
+                                                        "v-btn",
+                                                        {
+                                                          attrs: {
+                                                            depressed: "",
+                                                            color: "success",
+                                                            elevation: "2"
+                                                          },
+                                                          on: {
+                                                            click: function(
+                                                              $event
+                                                            ) {
+                                                              return _vm.addCart(
+                                                                _vm.product.id
+                                                              )
+                                                            }
+                                                          }
+                                                        },
+                                                        [
+                                                          _c(
+                                                            "v-icon",
+                                                            {
+                                                              attrs: {
+                                                                left: ""
+                                                              }
+                                                            },
+                                                            [
+                                                              _vm._v(
+                                                                " mdi-cart "
+                                                              )
+                                                            ]
+                                                          ),
+                                                          _vm._v(
+                                                            " ADD TO CART \n                                            "
+                                                          )
+                                                        ],
+                                                        1
                                                       )
-                                                    ]
+                                                    ],
+                                                    1
                                                   )
                                                 : _vm._e()
                                             ])
@@ -39222,13 +40291,9 @@ var render = function() {
                                 "v-btn",
                                 {
                                   attrs: {
-                                    color: "primary",
+                                    color: "orange white--text",
+                                    href: "/checkout",
                                     disabled: _vm.cartNumber == 0
-                                  },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.goToSite("/checkout")
-                                    }
                                   }
                                 },
                                 [
@@ -39242,74 +40307,32 @@ var render = function() {
                                 1
                               ),
                               _vm._v(" "),
-                              !_vm.cartObject.hasOwnProperty(_vm.product.id)
-                                ? _c(
-                                    "v-btn",
-                                    {
-                                      attrs: { depressed: "", elevation: "2" },
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.addCart(_vm.product.id)
-                                        }
-                                      }
-                                    },
-                                    [
-                                      _c("v-icon", { attrs: { left: "" } }, [
-                                        _vm._v(" mdi-cart ")
-                                      ]),
-                                      _vm._v(
-                                        " ADD TO CART \n                            "
-                                      )
-                                    ],
-                                    1
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: {
+                                    color: "success",
+                                    depressed: "",
+                                    elevation: "2"
+                                  },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.addCart(_vm.product.id)
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("v-icon", { attrs: { left: "" } }, [
+                                    _vm._v(" mdi-cart ")
+                                  ]),
+                                  _vm._v(
+                                    " ADD TO CART \n                            "
                                   )
-                                : [
-                                    _c(
-                                      "v-btn",
-                                      {
-                                        attrs: {
-                                          depressed: "",
-                                          elevation: "2"
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.addCart(_vm.product.id)
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _c("v-icon", { attrs: { left: "" } }, [
-                                          _vm._v(" mdi-cart ")
-                                        ]),
-                                        _vm._v(
-                                          " + 1\n                                "
-                                        )
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-btn",
-                                      {
-                                        attrs: { depressed: "" },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.deleteItemCart(
-                                              _vm.product.id
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _c("v-icon", { attrs: { left: "" } }, [
-                                          _vm._v(" mdi-delete ")
-                                        ])
-                                      ],
-                                      1
-                                    )
-                                  ]
+                                ],
+                                1
+                              )
                             ],
-                            2
+                            1
                           )
                         ],
                         1
@@ -39534,166 +40557,104 @@ var render = function() {
       _c("v-spacer"),
       _vm._v(" "),
       _c(
-        "v-btn-toggle",
+        "v-menu",
         {
-          attrs: { tile: "", color: "deep accent-3", group: "" },
+          attrs: {
+            "close-on-content-click": false,
+            "nudge-width": 200,
+            "offset-x": ""
+          },
+          scopedSlots: _vm._u([
+            {
+              key: "activator",
+              fn: function(ref) {
+                var on = ref.on
+                var attrs = ref.attrs
+                return [
+                  _c(
+                    "v-btn",
+                    _vm._g(
+                      _vm._b({ attrs: { icon: "" } }, "v-btn", attrs, false),
+                      on
+                    ),
+                    [
+                      _vm.cartNumber > 0
+                        ? _c(
+                            "v-badge",
+                            {
+                              attrs: { color: "green", content: _vm.cartNumber }
+                            },
+                            [_c("v-icon", [_vm._v("mdi-cart ")])],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.cartNumber == 0
+                        ? _c("v-icon", [_vm._v(" mdi-cart ")])
+                        : _vm._e()
+                    ],
+                    1
+                  )
+                ]
+              }
+            }
+          ]),
           model: {
-            value: _vm.text,
+            value: _vm.menu,
             callback: function($$v) {
-              _vm.text = $$v
+              _vm.menu = $$v
             },
-            expression: "text"
+            expression: "menu"
           }
         },
         [
-          _vm.data == "home"
-            ? _c("v-btn", { attrs: { value: "home", href: "#" + _vm.text } }, [
-                _vm._v(" HOME ")
-              ])
-            : _c("v-btn", { attrs: { value: "home", href: "/" } }, [
-                _vm._v(" HOME ")
-              ]),
-          _vm._v(" "),
-          _vm.data == "home"
-            ? _c(
-                "v-btn",
-                { attrs: { value: "products", href: "#" + _vm.text } },
-                [_vm._v(" PRODUCTS ")]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.data == "home"
-            ? _c("v-btn", { attrs: { value: "about", href: "#" + _vm.text } }, [
-                _vm._v(" ABOUT US ")
-              ])
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.data == "home"
-            ? _c(
-                "v-btn",
-                { attrs: { value: "contact", href: "#" + _vm.text } },
-                [_vm._v(" CONTACT ")]
-              )
-            : _vm._e(),
           _vm._v(" "),
           _c(
-            "v-menu",
-            {
-              attrs: {
-                "close-on-content-click": false,
-                "nudge-width": 200,
-                "offset-x": ""
-              },
-              scopedSlots: _vm._u([
-                {
-                  key: "activator",
-                  fn: function(ref) {
-                    var on = ref.on
-                    var attrs = ref.attrs
-                    return [
-                      _c(
-                        "v-btn",
-                        _vm._g(
-                          _vm._b(
-                            { attrs: { icon: "" } },
-                            "v-btn",
-                            attrs,
-                            false
-                          ),
-                          on
-                        ),
-                        [
-                          _vm.cartNumber > 0
-                            ? _c(
-                                "v-badge",
-                                {
-                                  attrs: {
-                                    color: "green",
-                                    content: _vm.cartNumber
-                                  }
-                                },
-                                [_c("v-icon", [_vm._v("mdi-cart ")])],
-                                1
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.cartNumber == 0
-                            ? _c("v-icon", [_vm._v(" mdi-cart ")])
-                            : _vm._e()
-                        ],
-                        1
-                      )
-                    ]
-                  }
-                }
-              ]),
-              model: {
-                value: _vm.menu,
-                callback: function($$v) {
-                  _vm.menu = $$v
-                },
-                expression: "menu"
-              }
-            },
+            "v-card",
             [
-              _vm._v(" "),
               _c(
-                "v-card",
+                "v-list",
                 [
                   _c(
-                    "v-list",
+                    "v-list-item",
                     [
+                      _c("v-list-item-avatar", [
+                        _c("img", {
+                          attrs: {
+                            src:
+                              "https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png",
+                            alt: "John"
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
                       _c(
-                        "v-list-item",
+                        "v-list-item-content",
                         [
-                          _c("v-list-item-avatar", [
-                            _c("img", {
+                          _c("v-list-item-title", [_vm._v("Shopping Cart")]),
+                          _vm._v(" "),
+                          _c("v-list-item-subtitle", [_vm._v("Products")])
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-list-item-action",
+                        [
+                          _c(
+                            "v-btn",
+                            {
                               attrs: {
-                                src:
-                                  "https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png",
-                                alt: "John"
+                                color: "orange white--text",
+                                href: "/checkout",
+                                disabled: _vm.cartNumber == 0
                               }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "v-list-item-content",
+                            },
                             [
-                              _c("v-list-item-title", [
-                                _vm._v("Shopping Cart")
+                              _c("v-icon", { attrs: { left: "" } }, [
+                                _vm._v("mdi-check")
                               ]),
-                              _vm._v(" "),
-                              _c("v-list-item-subtitle", [_vm._v("Products")])
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-list-item-action",
-                            [
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: {
-                                    color: "primary",
-                                    disabled: _vm.cartNumber == 0
-                                  },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.goToSite("/checkout")
-                                    }
-                                  }
-                                },
-                                [
-                                  _c("v-icon", { attrs: { left: "" } }, [
-                                    _vm._v("mdi-check")
-                                  ]),
-                                  _vm._v(
-                                    " CHECK OUT\n                            "
-                                  )
-                                ],
-                                1
-                              )
+                              _vm._v(" CHECK OUT\n                        ")
                             ],
                             1
                           )
@@ -39702,129 +40663,160 @@ var render = function() {
                       )
                     ],
                     1
-                  ),
-                  _vm._v(" "),
-                  _c("v-data-table", {
-                    staticClass: "elevation-1",
-                    attrs: {
-                      headers: _vm.headers,
-                      items: _vm.cartObjectJSON,
-                      "hide-default-footer": ""
-                    },
-                    scopedSlots: _vm._u(
-                      [
-                        {
-                          key: "item.picture",
-                          fn: function(ref) {
-                            var item = ref.item
-                            return [
-                              _c("v-list-item-avatar", [
-                                _c("img", {
-                                  attrs: {
-                                    src:
-                                      "data:image/png;base64," + item.picture,
-                                    alt: item.picture
-                                  }
-                                })
-                              ])
-                            ]
-                          }
-                        },
-                        {
-                          key: "item.actions",
-                          fn: function(ref) {
-                            var item = ref.item
-                            return [
-                              _c(
-                                "v-icon",
-                                {
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.addCart(item.id)
-                                    }
-                                  }
-                                },
-                                [_vm._v(" mdi-plus ")]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "v-icon",
-                                {
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.deleteItemCart(item.id)
-                                    }
-                                  }
-                                },
-                                [_vm._v(" mdi-delete ")]
-                              )
-                            ]
-                          }
-                        },
-                        {
-                          key: "item.price",
-                          fn: function(ref) {
-                            var item = ref.item
-                            return [
-                              _vm._v(
-                                "\n                        $ " +
-                                  _vm._s(item.price) +
-                                  "\n                    "
-                              )
-                            ]
-                          }
-                        },
-                        {
-                          key: "item.total",
-                          fn: function(ref) {
-                            var item = ref.item
-                            return [
-                              _vm._v(
-                                "\n                        $ " +
-                                  _vm._s(item.total) +
-                                  "\n                    "
-                              )
-                            ]
-                          }
-                        },
-                        {
-                          key: "no-data",
-                          fn: function() {
-                            return [
-                              _vm._v(
-                                "\n                        You don't have products added\n                    "
-                              )
-                            ]
-                          },
-                          proxy: true
-                        }
-                      ],
-                      null,
-                      true
-                    )
-                  })
+                  )
                 ],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-data-table", {
+                staticClass: "elevation-1 hidden-sm-and-down",
+                attrs: {
+                  headers: _vm.headers,
+                  items: _vm.cartObjectJSON,
+                  "hide-default-footer": ""
+                },
+                scopedSlots: _vm._u(
+                  [
+                    {
+                      key: "item.picture",
+                      fn: function(ref) {
+                        var item = ref.item
+                        return [
+                          _c("v-list-item-avatar", [
+                            _c("img", {
+                              attrs: {
+                                src: "data:image/png;base64," + item.picture,
+                                alt: item.picture
+                              }
+                            })
+                          ])
+                        ]
+                      }
+                    },
+                    {
+                      key: "item.actions",
+                      fn: function(ref) {
+                        var item = ref.item
+                        return [
+                          _c(
+                            "v-icon",
+                            {
+                              on: {
+                                click: function($event) {
+                                  return _vm.deleteItemCart(item.id)
+                                }
+                              }
+                            },
+                            [_vm._v(" mdi-close ")]
+                          )
+                        ]
+                      }
+                    },
+                    {
+                      key: "item.price",
+                      fn: function(ref) {
+                        var item = ref.item
+                        return [
+                          _vm._v(
+                            "\n                    $ " +
+                              _vm._s(item.price) +
+                              "\n                "
+                          )
+                        ]
+                      }
+                    },
+                    {
+                      key: "item.total",
+                      fn: function(ref) {
+                        var item = ref.item
+                        return [
+                          _vm._v(
+                            "\n                    $ " +
+                              _vm._s(item.total) +
+                              "\n                "
+                          )
+                        ]
+                      }
+                    },
+                    {
+                      key: "no-data",
+                      fn: function() {
+                        return [
+                          _vm._v(
+                            "\n                    You don't have products added\n                "
+                          )
+                        ]
+                      },
+                      proxy: true
+                    }
+                  ],
+                  null,
+                  true
+                )
+              })
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-toolbar-items",
+        { staticClass: "hidden-sm-and-down" },
+        _vm._l(_vm.menuItems, function(item) {
+          return _c(
+            "v-btn",
+            { key: item.title, attrs: { text: "", href: item.path } },
+            [_vm._v(" " + _vm._s(item.title) + " ")]
+          )
+        }),
+        1
+      ),
+      _vm._v(" "),
+      _vm.$vuetify.breakpoint.xsOnly || _vm.$vuetify.breakpoint.smOnly
+        ? _c(
+            "v-menu",
+            {
+              scopedSlots: _vm._u(
+                [
+                  {
+                    key: "activator",
+                    fn: function(ref) {
+                      var on = ref.on
+                      return [
+                        _c(
+                          "v-btn",
+                          _vm._g({ attrs: { icon: "" } }, on),
+                          [_c("v-icon", [_vm._v("mdi-menu")])],
+                          1
+                        )
+                      ]
+                    }
+                  }
+                ],
+                null,
+                false,
+                3153626740
+              )
+            },
+            [
+              _vm._v(" "),
+              _c(
+                "v-list",
+                _vm._l(_vm.menuItems, function(item, i) {
+                  return _c(
+                    "v-list-item",
+                    { key: i, attrs: { exact: "", href: item.path } },
+                    [_vm._v(" " + _vm._s(item.title) + " ")]
+                  )
+                }),
                 1
               )
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-btn",
-            {
-              attrs: { value: "login" },
-              on: {
-                click: function($event) {
-                  return _vm.goToSite("/login")
-                }
-              }
-            },
-            [_vm._v(" LOG IN ")]
           )
-        ],
-        1
-      )
+        : _vm._e()
     ],
     1
   )
@@ -43102,22 +44094,64 @@ if (inBrowser && window.Vue) {
 
 /***/ }),
 
-/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&":
-/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css& ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css&":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductDetails.vue?vue&type=style&index=0&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&");
+var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/CheckOutComponent.vue?vue&type=style&index=0&id=1b7f00f8&scoped=true&lang=css&");
 if(content.__esModule) content = content.default;
 if(typeof content === 'string') content = [[module.id, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var add = __webpack_require__(/*! !../../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
-var update = add("6d53b3e5", content, false, {});
+var update = add("27ea33ba", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/LandingPage.vue?vue&type=style&index=0&id=939d41f2&scoped=true&lang=css&");
+if(content.__esModule) content = content.default;
+if(typeof content === 'string') content = [[module.id, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! !../../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("1dc8a89c", content, false, {});
+// Hot Module Replacement
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css&":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css& ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&id=390b76bc&scoped=true&lang=css&");
+if(content.__esModule) content = content.default;
+if(typeof content === 'string') content = [[module.id, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__(/*! !../../../../node_modules/vue-style-loader/lib/addStylesClient.js */ "./node_modules/vue-style-loader/lib/addStylesClient.js").default
+var update = add("06ba3bce", content, false, {});
 // Hot Module Replacement
 if(false) {}
 
@@ -102033,6 +103067,17 @@ var index = {
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (index);
 
 
+
+/***/ }),
+
+/***/ "./resources/json/estados-municipios.json":
+/*!************************************************!*\
+  !*** ./resources/json/estados-municipios.json ***!
+  \************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('{"Aguascalientes":["Aguascalientes","Asientos","Calvillo","Cosío","Jesús María","Pabellón de Arteaga","Rincón de Romos","San José de Gracia","Tepezalá","El Llano","San Francisco de los Romo"],"Baja California":["Ensenada","Mexicali","Tecate","Tijuana","Playas de Rosarito"],"Baja California Sur":["Comondú","Mulegé","La Paz","Los Cabos","Loreto"],"Campeche":["Calkiní","Campeche","Carmen","Champotón","Hecelchakán","Hopelchén","Palizada","Tenabo","Escárcega","Calakmul","Candelaria"],"Coahuila de Zaragoza":["Abasolo","Acuña","Allende","Arteaga","Candela","Castaños","Cuatro Ciénegas","Escobedo","Francisco I. Madero","Frontera","General Cepeda","Guerrero","Hidalgo","Jiménez","Juárez","Lamadrid","Matamoros","Monclova","Morelos","Múzquiz","Nadadores","Nava","Ocampo","Parras","Piedras Negras","Progreso","Ramos Arizpe","Sabinas","Sacramento","Saltillo","San Buenaventura","San Juan de Sabinas","San Pedro","Sierra Mojada","Torreón","Viesca","Villa Unión","Zaragoza"],"Colima":["Armería","Colima","Comala","Coquimatlán","Cuauhtémoc","Ixtlahuacán","Manzanillo","Minatitlán","Tecomán","Villa de Álvarez"],"Chiapas":["Acacoyagua","Acala","Acapetahua","Altamirano","Amatán","Amatenango de la Frontera","Amatenango del Valle","Angel Albino Corzo","Arriaga","Bejucal de Ocampo","Bella Vista","Berriozábal","Bochil","El Bosque","Cacahoatán","Catazajá","Cintalapa","Coapilla","Comitán de Domínguez","La Concordia","Copainalá","Chalchihuitán","Chamula","Chanal","Chapultenango","Chenalhó","Chiapa de Corzo","Chiapilla","Chicoasén","Chicomuselo","Chilón","Escuintla","Francisco León","Frontera Comalapa","Frontera Hidalgo","La Grandeza","Huehuetán","Huixtán","Huitiupán","Huixtla","La Independencia","Ixhuatán","Ixtacomitán","Ixtapa","Ixtapangajoya","Jiquipilas","Jitotol","Juárez","Larráinzar","La Libertad","Mapastepec","Las Margaritas","Mazapa de Madero","Mazatán","Metapa","Mitontic","Motozintla","Nicolás Ruíz","Ocosingo","Ocotepec","Ocozocoautla de Espinosa","Ostuacán","Osumacinta","Oxchuc","Palenque","Pantelhó","Pantepec","Pichucalco","Pijijiapan","El Porvenir","Villa Comaltitlán","Pueblo Nuevo Solistahuacán","Rayón","Reforma","Las Rosas","Sabanilla","Salto de Agua","San Cristóbal de las Casas","San Fernando","Siltepec","Simojovel","Sitalá","Socoltenango","Solosuchiapa","Soyaló","Suchiapa","Suchiate","Sunuapa","Tapachula","Tapalapa","Tapilula","Tecpatán","Tenejapa","Teopisca","Tila","Tonalá","Totolapa","La Trinitaria","Tumbalá","Tuxtla Gutiérrez","Tuxtla Chico","Tuzantán","Tzimol","Unión Juárez","Venustiano Carranza","Villa Corzo","Villaflores","Yajalón","San Lucas","Zinacantán","San Juan Cancuc","Aldama","Benemérito de las Américas","Maravilla Tenejapa","Marqués de Comillas","Montecristo de Guerrero","San Andrés Duraznal","Santiago el Pinar","Capitán Luis Ángel Vidal","Rincón Chamula San Pedro","El Parral","Emiliano Zapata","Mezcalapa"],"Chihuahua":["Ahumada","Aldama","Allende","Aquiles Serdán","Ascensión","Bachíniva","Balleza","Batopilas de Manuel Gómez Morín","Bocoyna","Buenaventura","Camargo","Carichí","Casas Grandes","Coronado","Coyame del Sotol","La Cruz","Cuauhtémoc","Cusihuiriachi","Chihuahua","Chínipas","Delicias","Dr. Belisario Domínguez","Galeana","Santa Isabel","Gómez Farías","Gran Morelos","Guachochi","Guadalupe","Guadalupe y Calvo","Guazapares","Guerrero","Hidalgo del Parral","Huejotitán","Ignacio Zaragoza","Janos","Jiménez","Juárez","Julimes","López","Madera","Maguarichi","Manuel Benavides","Matachí","Matamoros","Meoqui","Morelos","Moris","Namiquipa","Nonoava","Nuevo Casas Grandes","Ocampo","Ojinaga","Praxedis G. Guerrero","Riva Palacio","Rosales","Rosario","San Francisco de Borja","San Francisco de Conchos","San Francisco del Oro","Santa Bárbara","Satevó","Saucillo","Temósachic","El Tule","Urique","Uruachi","Valle de Zaragoza"],"Ciudad de México":["Azcapotzalco","Coyoacán","Cuajimalpa de Morelos","Gustavo A. Madero","Iztacalco","Iztapalapa","La Magdalena Contreras","Milpa Alta","Álvaro Obregón","Tláhuac","Tlalpan","Xochimilco","Benito Juárez","Cuauhtémoc","Miguel Hidalgo","Venustiano Carranza"],"Durango":["Canatlán","Canelas","Coneto de Comonfort","Cuencamé","Durango","General Simón Bolívar","Gómez Palacio","Guadalupe Victoria","Guanaceví","Hidalgo","Indé","Lerdo","Mapimí","Mezquital","Nazas","Nombre de Dios","Ocampo","El Oro","Otáez","Pánuco de Coronado","Peñón Blanco","Poanas","Pueblo Nuevo","Rodeo","San Bernardo","San Dimas","San Juan de Guadalupe","San Juan del Río","San Luis del Cordero","San Pedro del Gallo","Santa Clara","Santiago Papasquiaro","Súchil","Tamazula","Tepehuanes","Tlahualilo","Topia","Vicente Guerrero","Nuevo Ideal"],"Guanajuato":["Abasolo","Acámbaro","San Miguel de Allende","Apaseo el Alto","Apaseo el Grande","Atarjea","Celaya","Manuel Doblado","Comonfort","Coroneo","Cortazar","Cuerámaro","Doctor Mora","Dolores Hidalgo Cuna de la Independencia Nacional","Guanajuato","Huanímaro","Irapuato","Jaral del Progreso","Jerécuaro","León","Moroleón","Ocampo","Pénjamo","Pueblo Nuevo","Purísima del Rincón","Romita","Salamanca","Salvatierra","San Diego de la Unión","San Felipe","San Francisco del Rincón","San José Iturbide","San Luis de la Paz","Santa Catarina","Santa Cruz de Juventino Rosas","Santiago Maravatío","Silao de la Victoria","Tarandacuao","Tarimoro","Tierra Blanca","Uriangato","Valle de Santiago","Victoria","Villagrán","Xichú","Yuriria"],"Guerrero":["Acapulco de Juárez","Ahuacuotzingo","Ajuchitlán del Progreso","Alcozauca de Guerrero","Alpoyeca","Apaxtla","Arcelia","Atenango del Río","Atlamajalcingo del Monte","Atlixtac","Atoyac de Álvarez","Ayutla de los Libres","Azoyú","Benito Juárez","Buenavista de Cuéllar","Coahuayutla de José María Izazaga","Cocula","Copala","Copalillo","Copanatoyac","Coyuca de Benítez","Coyuca de Catalán","Cuajinicuilapa","Cualác","Cuautepec","Cuetzala del Progreso","Cutzamala de Pinzón","Chilapa de Álvarez","Chilpancingo de los Bravo","Florencio Villarreal","General Canuto A. Neri","General Heliodoro Castillo","Huamuxtitlán","Huitzuco de los Figueroa","Iguala de la Independencia","Igualapa","Ixcateopan de Cuauhtémoc","Zihuatanejo de Azueta","Juan R. Escudero","Leonardo Bravo","Malinaltepec","Mártir de Cuilapan","Metlatónoc","Mochitlán","Olinalá","Ometepec","Pedro Ascencio Alquisiras","Petatlán","Pilcaya","Pungarabato","Quechultenango","San Luis Acatlán","San Marcos","San Miguel Totolapan","Taxco de Alarcón","Tecoanapa","Técpan de Galeana","Teloloapan","Tepecoacuilco de Trujano","Tetipac","Tixtla de Guerrero","Tlacoachistlahuaca","Tlacoapa","Tlalchapa","Tlalixtaquilla de Maldonado","Tlapa de Comonfort","Tlapehuala","La Unión de Isidoro Montes de Oca","Xalpatláhuac","Xochihuehuetlán","Xochistlahuaca","Zapotitlán Tablas","Zirándaro","Zitlala","Eduardo Neri","Acatepec","Marquelia","Cochoapa el Grande","José Joaquín de Herrera","Juchitán","Iliatenco"],"Hidalgo":["Acatlán","Acaxochitlán","Actopan","Agua Blanca de Iturbide","Ajacuba","Alfajayucan","Almoloya","Apan","El Arenal","Atitalaquia","Atlapexco","Atotonilco el Grande","Atotonilco de Tula","Calnali","Cardonal","Cuautepec de Hinojosa","Chapantongo","Chapulhuacán","Chilcuautla","Eloxochitlán","Emiliano Zapata","Epazoyucan","Francisco I. Madero","Huasca de Ocampo","Huautla","Huazalingo","Huehuetla","Huejutla de Reyes","Huichapan","Ixmiquilpan","Jacala de Ledezma","Jaltocán","Juárez Hidalgo","Lolotla","Metepec","San Agustín Metzquititlán","Metztitlán","Mineral del Chico","Mineral del Monte","La Misión","Mixquiahuala de Juárez","Molango de Escamilla","Nicolás Flores","Nopala de Villagrán","Omitlán de Juárez","San Felipe Orizatlán","Pacula","Pachuca de Soto","Pisaflores","Progreso de Obregón","Mineral de la Reforma","San Agustín Tlaxiaca","San Bartolo Tutotepec","San Salvador","Santiago de Anaya","Santiago Tulantepec de Lugo Guerrero","Singuilucan","Tasquillo","Tecozautla","Tenango de Doria","Tepeapulco","Tepehuacán de Guerrero","Tepeji del Río de Ocampo","Tepetitlán","Tetepango","Villa de Tezontepec","Tezontepec de Aldama","Tianguistengo","Tizayuca","Tlahuelilpan","Tlahuiltepa","Tlanalapa","Tlanchinol","Tlaxcoapan","Tolcayuca","Tula de Allende","Tulancingo de Bravo","Xochiatipan","Xochicoatlán","Yahualica","Zacualtipán de Ángeles","Zapotlán de Juárez","Zempoala","Zimapán"],"Jalisco":["Acatic","Acatlán de Juárez","Ahualulco de Mercado","Amacueca","Amatitán","Ameca","San Juanito de Escobedo","Arandas","El Arenal","Atemajac de Brizuela","Atengo","Atenguillo","Atotonilco el Alto","Atoyac","Autlán de Navarro","Ayotlán","Ayutla","La Barca","Bolaños","Cabo Corrientes","Casimiro Castillo","Cihuatlán","Zapotlán el Grande","Cocula","Colotlán","Concepción de Buenos Aires","Cuautitlán de García Barragán","Cuautla","Cuquío","Chapala","Chimaltitán","Chiquilistlán","Degollado","Ejutla","Encarnación de Díaz","Etzatlán","El Grullo","Guachinango","Guadalajara","Hostotipaquillo","Huejúcar","Huejuquilla el Alto","La Huerta","Ixtlahuacán de los Membrillos","Ixtlahuacán del Río","Jalostotitlán","Jamay","Jesús María","Jilotlán de los Dolores","Jocotepec","Juanacatlán","Juchitlán","Lagos de Moreno","El Limón","Magdalena","Santa María del Oro","La Manzanilla de la Paz","Mascota","Mazamitla","Mexticacán","Mezquitic","Mixtlán","Ocotlán","Ojuelos de Jalisco","Pihuamo","Poncitlán","Puerto Vallarta","Villa Purificación","Quitupan","El Salto","San Cristóbal de la Barranca","San Diego de Alejandría","San Juan de los Lagos","San Julián","San Marcos","San Martín de Bolaños","San Martín Hidalgo","San Miguel el Alto","Gómez Farías","San Sebastián del Oeste","Santa María de los Ángeles","Sayula","Tala","Talpa de Allende","Tamazula de Gordiano","Tapalpa","Tecalitlán","Tecolotlán","Techaluta de Montenegro","Tenamaxtlán","Teocaltiche","Teocuitatlán de Corona","Tepatitlán de Morelos","Tequila","Teuchitlán","Tizapán el Alto","Tlajomulco de Zúñiga","San Pedro Tlaquepaque","Tolimán","Tomatlán","Tonalá","Tonaya","Tonila","Totatiche","Tototlán","Tuxcacuesco","Tuxcueca","Tuxpan","Unión de San Antonio","Unión de Tula","Valle de Guadalupe","Valle de Juárez","San Gabriel","Villa Corona","Villa Guerrero","Villa Hidalgo","Cañadas de Obregón","Yahualica de González Gallo","Zacoalco de Torres","Zapopan","Zapotiltic","Zapotitlán de Vadillo","Zapotlán del Rey","Zapotlanejo","San Ignacio Cerro Gordo"],"México":["Acambay de Ruíz Castañeda","Acolman","Aculco","Almoloya de Alquisiras","Almoloya de Juárez","Almoloya del Río","Amanalco","Amatepec","Amecameca","Apaxco","Atenco","Atizapán","Atizapán de Zaragoza","Atlacomulco","Atlautla","Axapusco","Ayapango","Calimaya","Capulhuac","Coacalco de Berriozábal","Coatepec Harinas","Cocotitlán","Coyotepec","Cuautitlán","Chalco","Chapa de Mota","Chapultepec","Chiautla","Chicoloapan","Chiconcuac","Chimalhuacán","Donato Guerra","Ecatepec de Morelos","Ecatzingo","Huehuetoca","Hueypoxtla","Huixquilucan","Isidro Fabela","Ixtapaluca","Ixtapan de la Sal","Ixtapan del Oro","Ixtlahuaca","Xalatlaco","Jaltenco","Jilotepec","Jilotzingo","Jiquipilco","Jocotitlán","Joquicingo","Juchitepec","Lerma","Malinalco","Melchor Ocampo","Metepec","Mexicaltzingo","Morelos","Naucalpan de Juárez","Nezahualcóyotl","Nextlalpan","Nicolás Romero","Nopaltepec","Ocoyoacac","Ocuilan","El Oro","Otumba","Otzoloapan","Otzolotepec","Ozumba","Papalotla","La Paz","Polotitlán","Rayón","San Antonio la Isla","San Felipe del Progreso","San Martín de las Pirámides","San Mateo Atenco","San Simón de Guerrero","Santo Tomás","Soyaniquilpan de Juárez","Sultepec","Tecámac","Tejupilco","Temamatla","Temascalapa","Temascalcingo","Temascaltepec","Temoaya","Tenancingo","Tenango del Aire","Tenango del Valle","Teoloyucan","Teotihuacán","Tepetlaoxtoc","Tepetlixpa","Tepotzotlán","Tequixquiac","Texcaltitlán","Texcalyacac","Texcoco","Tezoyuca","Tianguistenco","Timilpan","Tlalmanalco","Tlalnepantla de Baz","Tlatlaya","Toluca","Tonatico","Tultepec","Tultitlán","Valle de Bravo","Villa de Allende","Villa del Carbón","Villa Guerrero","Villa Victoria","Xonacatlán","Zacazonapan","Zacualpan","Zinacantepec","Zumpahuacán","Zumpango","Cuautitlán Izcalli","Valle de Chalco Solidaridad","Luvianos","San José del Rincón","Tonanitla"],"Michoacán de Ocampo":["Acuitzio","Aguililla","Álvaro Obregón","Angamacutiro","Angangueo","Apatzingán","Aporo","Aquila","Ario","Arteaga","Briseñas","Buenavista","Carácuaro","Coahuayana","Coalcomán de Vázquez Pallares","Coeneo","Contepec","Copándaro","Cotija","Cuitzeo","Charapan","Charo","Chavinda","Cherán","Chilchota","Chinicuila","Chucándiro","Churintzio","Churumuco","Ecuandureo","Epitacio Huerta","Erongarícuaro","Gabriel Zamora","Hidalgo","La Huacana","Huandacareo","Huaniqueo","Huetamo","Huiramba","Indaparapeo","Irimbo","Ixtlán","Jacona","Jiménez","Jiquilpan","Juárez","Jungapeo","Lagunillas","Madero","Maravatío","Marcos Castellanos","Lázaro Cárdenas","Morelia","Morelos","Múgica","Nahuatzen","Nocupétaro","Nuevo Parangaricutiro","Nuevo Urecho","Numarán","Ocampo","Pajacuarán","Panindícuaro","Parácuaro","Paracho","Pátzcuaro","Penjamillo","Peribán","La Piedad","Purépero","Puruándiro","Queréndaro","Quiroga","Cojumatlán de Régules","Los Reyes","Sahuayo","San Lucas","Santa Ana Maya","Salvador Escalante","Senguio","Susupuato","Tacámbaro","Tancítaro","Tangamandapio","Tangancícuaro","Tanhuato","Taretan","Tarímbaro","Tepalcatepec","Tingambato","Tingüindín","Tiquicheo de Nicolás Romero","Tlalpujahua","Tlazazalca","Tocumbo","Tumbiscatío","Turicato","Tuxpan","Tuzantla","Tzintzuntzan","Tzitzio","Uruapan","Venustiano Carranza","Villamar","Vista Hermosa","Yurécuaro","Zacapu","Zamora","Zináparo","Zinapécuaro","Ziracuaretiro","Zitácuaro","José Sixto Verduzco"],"Morelos":["Amacuzac","Atlatlahucan","Axochiapan","Ayala","Coatlán del Río","Cuautla","Cuernavaca","Emiliano Zapata","Huitzilac","Jantetelco","Jiutepec","Jojutla","Jonacatepec de Leandro Valle","Mazatepec","Miacatlán","Ocuituco","Puente de Ixtla","Temixco","Tepalcingo","Tepoztlán","Tetecala","Tetela del Volcán","Tlalnepantla","Tlaltizapán de Zapata","Tlaquiltenango","Tlayacapan","Totolapan","Xochitepec","Yautepec","Yecapixtla","Zacatepec","Zacualpan de Amilpas","Temoac"],"Nayarit":["Acaponeta","Ahuacatlán","Amatlán de Cañas","Compostela","Huajicori","Ixtlán del Río","Jala","Xalisco","Del Nayar","Rosamorada","Ruíz","San Blas","San Pedro Lagunillas","Santa María del Oro","Santiago Ixcuintla","Tecuala","Tepic","Tuxpan","La Yesca","Bahía de Banderas"],"Nuevo León":["Abasolo","Agualeguas","Los Aldamas","Allende","Anáhuac","Apodaca","Aramberri","Bustamante","Cadereyta Jiménez","El Carmen","Cerralvo","Ciénega de Flores","China","Doctor Arroyo","Doctor Coss","Doctor González","Galeana","García","San Pedro Garza García","General Bravo","General Escobedo","General Terán","General Treviño","General Zaragoza","General Zuazua","Guadalupe","Los Herreras","Higueras","Hualahuises","Iturbide","Juárez","Lampazos de Naranjo","Linares","Marín","Melchor Ocampo","Mier y Noriega","Mina","Montemorelos","Monterrey","Parás","Pesquería","Los Ramones","Rayones","Sabinas Hidalgo","Salinas Victoria","San Nicolás de los Garza","Hidalgo","Santa Catarina","Santiago","Vallecillo","Villaldama"],"Oaxaca":["Abejones","Acatlán de Pérez Figueroa","Asunción Cacalotepec","Asunción Cuyotepeji","Asunción Ixtaltepec","Asunción Nochixtlán","Asunción Ocotlán","Asunción Tlacolulita","Ayotzintepec","El Barrio de la Soledad","Calihualá","Candelaria Loxicha","Ciénega de Zimatlán","Ciudad Ixtepec","Coatecas Altas","Coicoyán de las Flores","La Compañía","Concepción Buenavista","Concepción Pápalo","Constancia del Rosario","Cosolapa","Cosoltepec","Cuilápam de Guerrero","Cuyamecalco Villa de Zaragoza","Chahuites","Chalcatongo de Hidalgo","Chiquihuitlán de Benito Juárez","Heroica Ciudad de Ejutla de Crespo","Eloxochitlán de Flores Magón","El Espinal","Tamazulápam del Espíritu Santo","Fresnillo de Trujano","Guadalupe Etla","Guadalupe de Ramírez","Guelatao de Juárez","Guevea de Humboldt","Mesones Hidalgo","Villa Hidalgo","Heroica Ciudad de Huajuapan de León","Huautepec","Huautla de Jiménez","Ixtlán de Juárez","Heroica Ciudad de Juchitán de Zaragoza","Loma Bonita","Magdalena Apasco","Magdalena Jaltepec","Santa Magdalena Jicotlán","Magdalena Mixtepec","Magdalena Ocotlán","Magdalena Peñasco","Magdalena Teitipac","Magdalena Tequisistlán","Magdalena Tlacotepec","Magdalena Zahuatlán","Mariscala de Juárez","Mártires de Tacubaya","Matías Romero Avendaño","Mazatlán Villa de Flores","Miahuatlán de Porfirio Díaz","Mixistlán de la Reforma","Monjas","Natividad","Nazareno Etla","Nejapa de Madero","Ixpantepec Nieves","Santiago Niltepec","Oaxaca de Juárez","Ocotlán de Morelos","La Pe","Pinotepa de Don Luis","Pluma Hidalgo","San José del Progreso","Putla Villa de Guerrero","Santa Catarina Quioquitani","Reforma de Pineda","La Reforma","Reyes Etla","Rojas de Cuauhtémoc","Salina Cruz","San Agustín Amatengo","San Agustín Atenango","San Agustín Chayuco","San Agustín de las Juntas","San Agustín Etla","San Agustín Loxicha","San Agustín Tlacotepec","San Agustín Yatareni","San Andrés Cabecera Nueva","San Andrés Dinicuiti","San Andrés Huaxpaltepec","San Andrés Huayápam","San Andrés Ixtlahuaca","San Andrés Lagunas","San Andrés Nuxiño","San Andrés Paxtlán","San Andrés Sinaxtla","San Andrés Solaga","San Andrés Teotilálpam","San Andrés Tepetlapa","San Andrés Yaá","San Andrés Zabache","San Andrés Zautla","San Antonino Castillo Velasco","San Antonino el Alto","San Antonino Monte Verde","San Antonio Acutla","San Antonio de la Cal","San Antonio Huitepec","San Antonio Nanahuatípam","San Antonio Sinicahua","San Antonio Tepetlapa","San Baltazar Chichicápam","San Baltazar Loxicha","San Baltazar Yatzachi el Bajo","San Bartolo Coyotepec","San Bartolomé Ayautla","San Bartolomé Loxicha","San Bartolomé Quialana","San Bartolomé Yucuañe","San Bartolomé Zoogocho","San Bartolo Soyaltepec","San Bartolo Yautepec","San Bernardo Mixtepec","San Blas Atempa","San Carlos Yautepec","San Cristóbal Amatlán","San Cristóbal Amoltepec","San Cristóbal Lachirioag","San Cristóbal Suchixtlahuaca","San Dionisio del Mar","San Dionisio Ocotepec","San Dionisio Ocotlán","San Esteban Atatlahuca","San Felipe Jalapa de Díaz","San Felipe Tejalápam","San Felipe Usila","San Francisco Cahuacuá","San Francisco Cajonos","San Francisco Chapulapa","San Francisco Chindúa","San Francisco del Mar","San Francisco Huehuetlán","San Francisco Ixhuatán","San Francisco Jaltepetongo","San Francisco Lachigoló","San Francisco Logueche","San Francisco Nuxaño","San Francisco Ozolotepec","San Francisco Sola","San Francisco Telixtlahuaca","San Francisco Teopan","San Francisco Tlapancingo","San Gabriel Mixtepec","San Ildefonso Amatlán","San Ildefonso Sola","San Ildefonso Villa Alta","San Jacinto Amilpas","San Jacinto Tlacotepec","San Jerónimo Coatlán","San Jerónimo Silacayoapilla","San Jerónimo Sosola","San Jerónimo Taviche","San Jerónimo Tecóatl","San Jorge Nuchita","San José Ayuquila","San José Chiltepec","San José del Peñasco","San José Estancia Grande","San José Independencia","San José Lachiguiri","San José Tenango","San Juan Achiutla","San Juan Atepec","Ánimas Trujano","San Juan Bautista Atatlahuca","San Juan Bautista Coixtlahuaca","San Juan Bautista Cuicatlán","San Juan Bautista Guelache","San Juan Bautista Jayacatlán","San Juan Bautista Lo de Soto","San Juan Bautista Suchitepec","San Juan Bautista Tlacoatzintepec","San Juan Bautista Tlachichilco","San Juan Bautista Tuxtepec","San Juan Cacahuatepec","San Juan Cieneguilla","San Juan Coatzóspam","San Juan Colorado","San Juan Comaltepec","San Juan Cotzocón","San Juan Chicomezúchil","San Juan Chilateca","San Juan del Estado","San Juan del Río","San Juan Diuxi","San Juan Evangelista Analco","San Juan Guelavía","San Juan Guichicovi","San Juan Ihualtepec","San Juan Juquila Mixes","San Juan Juquila Vijanos","San Juan Lachao","San Juan Lachigalla","San Juan Lajarcia","San Juan Lalana","San Juan de los Cués","San Juan Mazatlán","San Juan Mixtepec","San Juan Mixtepec","San Juan Ñumí","San Juan Ozolotepec","San Juan Petlapa","San Juan Quiahije","San Juan Quiotepec","San Juan Sayultepec","San Juan Tabaá","San Juan Tamazola","San Juan Teita","San Juan Teitipac","San Juan Tepeuxila","San Juan Teposcolula","San Juan Yaeé","San Juan Yatzona","San Juan Yucuita","San Lorenzo","San Lorenzo Albarradas","San Lorenzo Cacaotepec","San Lorenzo Cuaunecuiltitla","San Lorenzo Texmelúcan","San Lorenzo Victoria","San Lucas Camotlán","San Lucas Ojitlán","San Lucas Quiaviní","San Lucas Zoquiápam","San Luis Amatlán","San Marcial Ozolotepec","San Marcos Arteaga","San Martín de los Cansecos","San Martín Huamelúlpam","San Martín Itunyoso","San Martín Lachilá","San Martín Peras","San Martín Tilcajete","San Martín Toxpalan","San Martín Zacatepec","San Mateo Cajonos","Capulálpam de Méndez","San Mateo del Mar","San Mateo Yoloxochitlán","San Mateo Etlatongo","San Mateo Nejápam","San Mateo Peñasco","San Mateo Piñas","San Mateo Río Hondo","San Mateo Sindihui","San Mateo Tlapiltepec","San Melchor Betaza","San Miguel Achiutla","San Miguel Ahuehuetitlán","San Miguel Aloápam","San Miguel Amatitlán","San Miguel Amatlán","San Miguel Coatlán","San Miguel Chicahua","San Miguel Chimalapa","San Miguel del Puerto","San Miguel del Río","San Miguel Ejutla","San Miguel el Grande","San Miguel Huautla","San Miguel Mixtepec","San Miguel Panixtlahuaca","San Miguel Peras","San Miguel Piedras","San Miguel Quetzaltepec","San Miguel Santa Flor","Villa Sola de Vega","San Miguel Soyaltepec","San Miguel Suchixtepec","Villa Talea de Castro","San Miguel Tecomatlán","San Miguel Tenango","San Miguel Tequixtepec","San Miguel Tilquiápam","San Miguel Tlacamama","San Miguel Tlacotepec","San Miguel Tulancingo","San Miguel Yotao","San Nicolás","San Nicolás Hidalgo","San Pablo Coatlán","San Pablo Cuatro Venados","San Pablo Etla","San Pablo Huitzo","San Pablo Huixtepec","San Pablo Macuiltianguis","San Pablo Tijaltepec","San Pablo Villa de Mitla","San Pablo Yaganiza","San Pedro Amuzgos","San Pedro Apóstol","San Pedro Atoyac","San Pedro Cajonos","San Pedro Coxcaltepec Cántaros","San Pedro Comitancillo","San Pedro el Alto","San Pedro Huamelula","San Pedro Huilotepec","San Pedro Ixcatlán","San Pedro Ixtlahuaca","San Pedro Jaltepetongo","San Pedro Jicayán","San Pedro Jocotipac","San Pedro Juchatengo","San Pedro Mártir","San Pedro Mártir Quiechapa","San Pedro Mártir Yucuxaco","San Pedro Mixtepec","San Pedro Mixtepec","San Pedro Molinos","San Pedro Nopala","San Pedro Ocopetatillo","San Pedro Ocotepec","San Pedro Pochutla","San Pedro Quiatoni","San Pedro Sochiápam","San Pedro Tapanatepec","San Pedro Taviche","San Pedro Teozacoalco","San Pedro Teutila","San Pedro Tidaá","San Pedro Topiltepec","San Pedro Totolápam","Villa de Tututepec","San Pedro Yaneri","San Pedro Yólox","San Pedro y San Pablo Ayutla","Villa de Etla","San Pedro y San Pablo Teposcolula","San Pedro y San Pablo Tequixtepec","San Pedro Yucunama","San Raymundo Jalpan","San Sebastián Abasolo","San Sebastián Coatlán","San Sebastián Ixcapa","San Sebastián Nicananduta","San Sebastián Río Hondo","San Sebastián Tecomaxtlahuaca","San Sebastián Teitipac","San Sebastián Tutla","San Simón Almolongas","San Simón Zahuatlán","Santa Ana","Santa Ana Ateixtlahuaca","Santa Ana Cuauhtémoc","Santa Ana del Valle","Santa Ana Tavela","Santa Ana Tlapacoyan","Santa Ana Yareni","Santa Ana Zegache","Santa Catalina Quierí","Santa Catarina Cuixtla","Santa Catarina Ixtepeji","Santa Catarina Juquila","Santa Catarina Lachatao","Santa Catarina Loxicha","Santa Catarina Mechoacán","Santa Catarina Minas","Santa Catarina Quiané","Santa Catarina Tayata","Santa Catarina Ticuá","Santa Catarina Yosonotú","Santa Catarina Zapoquila","Santa Cruz Acatepec","Santa Cruz Amilpas","Santa Cruz de Bravo","Santa Cruz Itundujia","Santa Cruz Mixtepec","Santa Cruz Nundaco","Santa Cruz Papalutla","Santa Cruz Tacache de Mina","Santa Cruz Tacahua","Santa Cruz Tayata","Santa Cruz Xitla","Santa Cruz Xoxocotlán","Santa Cruz Zenzontepec","Santa Gertrudis","Santa Inés del Monte","Santa Inés Yatzeche","Santa Lucía del Camino","Santa Lucía Miahuatlán","Santa Lucía Monteverde","Santa Lucía Ocotlán","Santa María Alotepec","Santa María Apazco","Santa María la Asunción","Heroica Ciudad de Tlaxiaco","Ayoquezco de Aldama","Santa María Atzompa","Santa María Camotlán","Santa María Colotepec","Santa María Cortijo","Santa María Coyotepec","Santa María Chachoápam","Villa de Chilapa de Díaz","Santa María Chilchotla","Santa María Chimalapa","Santa María del Rosario","Santa María del Tule","Santa María Ecatepec","Santa María Guelacé","Santa María Guienagati","Santa María Huatulco","Santa María Huazolotitlán","Santa María Ipalapa","Santa María Ixcatlán","Santa María Jacatepec","Santa María Jalapa del Marqués","Santa María Jaltianguis","Santa María Lachixío","Santa María Mixtequilla","Santa María Nativitas","Santa María Nduayaco","Santa María Ozolotepec","Santa María Pápalo","Santa María Peñoles","Santa María Petapa","Santa María Quiegolani","Santa María Sola","Santa María Tataltepec","Santa María Tecomavaca","Santa María Temaxcalapa","Santa María Temaxcaltepec","Santa María Teopoxco","Santa María Tepantlali","Santa María Texcatitlán","Santa María Tlahuitoltepec","Santa María Tlalixtac","Santa María Tonameca","Santa María Totolapilla","Santa María Xadani","Santa María Yalina","Santa María Yavesía","Santa María Yolotepec","Santa María Yosoyúa","Santa María Yucuhiti","Santa María Zacatepec","Santa María Zaniza","Santa María Zoquitlán","Santiago Amoltepec","Santiago Apoala","Santiago Apóstol","Santiago Astata","Santiago Atitlán","Santiago Ayuquililla","Santiago Cacaloxtepec","Santiago Camotlán","Santiago Comaltepec","Santiago Chazumba","Santiago Choápam","Santiago del Río","Santiago Huajolotitlán","Santiago Huauclilla","Santiago Ihuitlán Plumas","Santiago Ixcuintepec","Santiago Ixtayutla","Santiago Jamiltepec","Santiago Jocotepec","Santiago Juxtlahuaca","Santiago Lachiguiri","Santiago Lalopa","Santiago Laollaga","Santiago Laxopa","Santiago Llano Grande","Santiago Matatlán","Santiago Miltepec","Santiago Minas","Santiago Nacaltepec","Santiago Nejapilla","Santiago Nundiche","Santiago Nuyoó","Santiago Pinotepa Nacional","Santiago Suchilquitongo","Santiago Tamazola","Santiago Tapextla","Villa Tejúpam de la Unión","Santiago Tenango","Santiago Tepetlapa","Santiago Tetepec","Santiago Texcalcingo","Santiago Textitlán","Santiago Tilantongo","Santiago Tillo","Santiago Tlazoyaltepec","Santiago Xanica","Santiago Xiacuí","Santiago Yaitepec","Santiago Yaveo","Santiago Yolomécatl","Santiago Yosondúa","Santiago Yucuyachi","Santiago Zacatepec","Santiago Zoochila","Nuevo Zoquiápam","Santo Domingo Ingenio","Santo Domingo Albarradas","Santo Domingo Armenta","Santo Domingo Chihuitán","Santo Domingo de Morelos","Santo Domingo Ixcatlán","Santo Domingo Nuxaá","Santo Domingo Ozolotepec","Santo Domingo Petapa","Santo Domingo Roayaga","Santo Domingo Tehuantepec","Santo Domingo Teojomulco","Santo Domingo Tepuxtepec","Santo Domingo Tlatayápam","Santo Domingo Tomaltepec","Santo Domingo Tonalá","Santo Domingo Tonaltepec","Santo Domingo Xagacía","Santo Domingo Yanhuitlán","Santo Domingo Yodohino","Santo Domingo Zanatepec","Santos Reyes Nopala","Santos Reyes Pápalo","Santos Reyes Tepejillo","Santos Reyes Yucuná","Santo Tomás Jalieza","Santo Tomás Mazaltepec","Santo Tomás Ocotepec","Santo Tomás Tamazulapan","San Vicente Coatlán","San Vicente Lachixío","San Vicente Nuñú","Silacayoápam","Sitio de Xitlapehua","Soledad Etla","Villa de Tamazulápam del Progreso","Tanetze de Zaragoza","Taniche","Tataltepec de Valdés","Teococuilco de Marcos Pérez","Teotitlán de Flores Magón","Teotitlán del Valle","Teotongo","Tepelmeme Villa de Morelos","Heroica Villa Tezoatlán de Segura y Luna, Cuna de la Independencia de Oaxaca","San Jerónimo Tlacochahuaya","Tlacolula de Matamoros","Tlacotepec Plumas","Tlalixtac de Cabrera","Totontepec Villa de Morelos","Trinidad Zaachila","La Trinidad Vista Hermosa","Unión Hidalgo","Valerio Trujano","San Juan Bautista Valle Nacional","Villa Díaz Ordaz","Yaxe","Magdalena Yodocono de Porfirio Díaz","Yogana","Yutanduchi de Guerrero","Villa de Zaachila","San Mateo Yucutindoo","Zapotitlán Lagunas","Zapotitlán Palmas","Santa Inés de Zaragoza","Zimatlán de Álvarez"],"Puebla":["Acajete","Acateno","Acatlán","Acatzingo","Acteopan","Ahuacatlán","Ahuatlán","Ahuazotepec","Ahuehuetitla","Ajalpan","Albino Zertuche","Aljojuca","Altepexi","Amixtlán","Amozoc","Aquixtla","Atempan","Atexcal","Atlixco","Atoyatempan","Atzala","Atzitzihuacán","Atzitzintla","Axutla","Ayotoxco de Guerrero","Calpan","Caltepec","Camocuautla","Caxhuacan","Coatepec","Coatzingo","Cohetzala","Cohuecan","Coronango","Coxcatlán","Coyomeapan","Coyotepec","Cuapiaxtla de Madero","Cuautempan","Cuautinchán","Cuautlancingo","Cuayuca de Andrade","Cuetzalan del Progreso","Cuyoaco","Chalchicomula de Sesma","Chapulco","Chiautla","Chiautzingo","Chiconcuautla","Chichiquila","Chietla","Chigmecatitlán","Chignahuapan","Chignautla","Chila","Chila de la Sal","Honey","Chilchotla","Chinantla","Domingo Arenas","Eloxochitlán","Epatlán","Esperanza","Francisco Z. Mena","General Felipe Ángeles","Guadalupe","Guadalupe Victoria","Hermenegildo Galeana","Huaquechula","Huatlatlauca","Huauchinango","Huehuetla","Huehuetlán el Chico","Huejotzingo","Hueyapan","Hueytamalco","Hueytlalpan","Huitzilan de Serdán","Huitziltepec","Atlequizayan","Ixcamilpa de Guerrero","Ixcaquixtla","Ixtacamaxtitlán","Ixtepec","Izúcar de Matamoros","Jalpan","Jolalpan","Jonotla","Jopala","Juan C. Bonilla","Juan Galindo","Juan N. Méndez","Lafragua","Libres","La Magdalena Tlatlauquitepec","Mazapiltepec de Juárez","Mixtla","Molcaxac","Cañada Morelos","Naupan","Nauzontla","Nealtican","Nicolás Bravo","Nopalucan","Ocotepec","Ocoyucan","Olintla","Oriental","Pahuatlán","Palmar de Bravo","Pantepec","Petlalcingo","Piaxtla","Puebla","Quecholac","Quimixtlán","Rafael Lara Grajales","Los Reyes de Juárez","San Andrés Cholula","San Antonio Cañada","San Diego la Mesa Tochimiltzingo","San Felipe Teotlalcingo","San Felipe Tepatlán","San Gabriel Chilac","San Gregorio Atzompa","San Jerónimo Tecuanipan","San Jerónimo Xayacatlán","San José Chiapa","San José Miahuatlán","San Juan Atenco","San Juan Atzompa","San Martín Texmelucan","San Martín Totoltepec","San Matías Tlalancaleca","San Miguel Ixitlán","San Miguel Xoxtla","San Nicolás Buenos Aires","San Nicolás de los Ranchos","San Pablo Anicano","San Pedro Cholula","San Pedro Yeloixtlahuaca","San Salvador el Seco","San Salvador el Verde","San Salvador Huixcolotla","San Sebastián Tlacotepec","Santa Catarina Tlaltempan","Santa Inés Ahuatempan","Santa Isabel Cholula","Santiago Miahuatlán","Huehuetlán el Grande","Santo Tomás Hueyotlipan","Soltepec","Tecali de Herrera","Tecamachalco","Tecomatlán","Tehuacán","Tehuitzingo","Tenampulco","Teopantlán","Teotlalco","Tepanco de López","Tepango de Rodríguez","Tepatlaxco de Hidalgo","Tepeaca","Tepemaxalco","Tepeojuma","Tepetzintla","Tepexco","Tepexi de Rodríguez","Tepeyahualco","Tepeyahualco de Cuauhtémoc","Tetela de Ocampo","Teteles de Avila Castillo","Teziutlán","Tianguismanalco","Tilapa","Tlacotepec de Benito Juárez","Tlacuilotepec","Tlachichuca","Tlahuapan","Tlaltenango","Tlanepantla","Tlaola","Tlapacoya","Tlapanalá","Tlatlauquitepec","Tlaxco","Tochimilco","Tochtepec","Totoltepec de Guerrero","Tulcingo","Tuzamapan de Galeana","Tzicatlacoyan","Venustiano Carranza","Vicente Guerrero","Xayacatlán de Bravo","Xicotepec","Xicotlán","Xiutetelco","Xochiapulco","Xochiltepec","Xochitlán de Vicente Suárez","Xochitlán Todos Santos","Yaonáhuac","Yehualtepec","Zacapala","Zacapoaxtla","Zacatlán","Zapotitlán","Zapotitlán de Méndez","Zaragoza","Zautla","Zihuateutla","Zinacatepec","Zongozotla","Zoquiapan","Zoquitlán"],"Querétaro":["Amealco de Bonfil","Pinal de Amoles","Arroyo Seco","Cadereyta de Montes","Colón","Corregidora","Ezequiel Montes","Huimilpan","Jalpan de Serra","Landa de Matamoros","El Marqués","Pedro Escobedo","Peñamiller","Querétaro","San Joaquín","San Juan del Río","Tequisquiapan","Tolimán"],"Quintana Roo":["Cozumel","Felipe Carrillo Puerto","Isla Mujeres","Othón P. Blanco","Benito Juárez","José María Morelos","Lázaro Cárdenas","Solidaridad","Tulum","Bacalar","Puerto Morelos"],"San Luis Potosí":["Ahualulco","Alaquines","Aquismón","Armadillo de los Infante","Cárdenas","Catorce","Cedral","Cerritos","Cerro de San Pedro","Ciudad del Maíz","Ciudad Fernández","Tancanhuitz","Ciudad Valles","Coxcatlán","Charcas","Ebano","Guadalcázar","Huehuetlán","Lagunillas","Matehuala","Mexquitic de Carmona","Moctezuma","Rayón","Rioverde","Salinas","San Antonio","San Ciro de Acosta","San Luis Potosí","San Martín Chalchicuautla","San Nicolás Tolentino","Santa Catarina","Santa María del Río","Santo Domingo","San Vicente Tancuayalab","Soledad de Graciano Sánchez","Tamasopo","Tamazunchale","Tampacán","Tampamolón Corona","Tamuín","Tanlajás","Tanquián de Escobedo","Tierra Nueva","Vanegas","Venado","Villa de Arriaga","Villa de Guadalupe","Villa de la Paz","Villa de Ramos","Villa de Reyes","Villa Hidalgo","Villa Juárez","Axtla de Terrazas","Xilitla","Zaragoza","Villa de Arista","Matlapa","El Naranjo"],"Sinaloa":["Ahome","Angostura","Badiraguato","Concordia","Cosalá","Culiacán","Choix","Elota","Escuinapa","El Fuerte","Guasave","Mazatlán","Mocorito","Rosario","Salvador Alvarado","San Ignacio","Sinaloa","Navolato"],"Sonora":["Aconchi","Agua Prieta","Alamos","Altar","Arivechi","Arizpe","Atil","Bacadéhuachi","Bacanora","Bacerac","Bacoachi","Bácum","Banámichi","Baviácora","Bavispe","Benjamín Hill","Caborca","Cajeme","Cananea","Carbó","La Colorada","Cucurpe","Cumpas","Divisaderos","Empalme","Etchojoa","Fronteras","Granados","Guaymas","Hermosillo","Huachinera","Huásabas","Huatabampo","Huépac","Imuris","Magdalena","Mazatán","Moctezuma","Naco","Nácori Chico","Nacozari de García","Navojoa","Nogales","Onavas","Opodepe","Oquitoa","Pitiquito","Puerto Peñasco","Quiriego","Rayón","Rosario","Sahuaripa","San Felipe de Jesús","San Javier","San Luis Río Colorado","San Miguel de Horcasitas","San Pedro de la Cueva","Santa Ana","Santa Cruz","Sáric","Soyopa","Suaqui Grande","Tepache","Trincheras","Tubutama","Ures","Villa Hidalgo","Villa Pesqueira","Yécora","General Plutarco Elías Calles","Benito Juárez","San Ignacio Río Muerto"],"Tabasco":["Balancán","Cárdenas","Centla","Centro","Comalcalco","Cunduacán","Emiliano Zapata","Huimanguillo","Jalapa","Jalpa de Méndez","Jonuta","Macuspana","Nacajuca","Paraíso","Tacotalpa","Teapa","Tenosique"],"Tamaulipas":["Abasolo","Aldama","Altamira","Antiguo Morelos","Burgos","Bustamante","Camargo","Casas","Ciudad Madero","Cruillas","Gómez Farías","González","Güémez","Guerrero","Gustavo Díaz Ordaz","Hidalgo","Jaumave","Jiménez","Llera","Mainero","El Mante","Matamoros","Méndez","Mier","Miguel Alemán","Miquihuana","Nuevo Laredo","Nuevo Morelos","Ocampo","Padilla","Palmillas","Reynosa","Río Bravo","San Carlos","San Fernando","San Nicolás","Soto la Marina","Tampico","Tula","Valle Hermoso","Victoria","Villagrán","Xicoténcatl"],"Tlaxcala":["Amaxac de Guerrero","Apetatitlán de Antonio Carvajal","Atlangatepec","Atltzayanca","Apizaco","Calpulalpan","El Carmen Tequexquitla","Cuapiaxtla","Cuaxomulco","Chiautempan","Muñoz de Domingo Arenas","Españita","Huamantla","Hueyotlipan","Ixtacuixtla de Mariano Matamoros","Ixtenco","Mazatecochco de José María Morelos","Contla de Juan Cuamatzi","Tepetitla de Lardizábal","Sanctórum de Lázaro Cárdenas","Nanacamilpa de Mariano Arista","Acuamanala de Miguel Hidalgo","Natívitas","Panotla","San Pablo del Monte","Santa Cruz Tlaxcala","Tenancingo","Teolocholco","Tepeyanco","Terrenate","Tetla de la Solidaridad","Tetlatlahuca","Tlaxcala","Tlaxco","Tocatlán","Totolac","Ziltlaltépec de Trinidad Sánchez Santos","Tzompantepec","Xaloztoc","Xaltocan","Papalotla de Xicohténcatl","Xicohtzinco","Yauhquemehcan","Zacatelco","Benito Juárez","Emiliano Zapata","Lázaro Cárdenas","La Magdalena Tlaltelulco","San Damián Texóloc","San Francisco Tetlanohcan","San Jerónimo Zacualpan","San José Teacalco","San Juan Huactzinco","San Lorenzo Axocomanitla","San Lucas Tecopilco","Santa Ana Nopalucan","Santa Apolonia Teacalco","Santa Catarina Ayometla","Santa Cruz Quilehtla","Santa Isabel Xiloxoxtla"],"Veracruz de Ignacio de la Llave":["Acajete","Acatlán","Acayucan","Actopan","Acula","Acultzingo","Camarón de Tejeda","Alpatláhuac","Alto Lucero de Gutiérrez Barrios","Altotonga","Alvarado","Amatitlán","Naranjos Amatlán","Amatlán de los Reyes","Angel R. Cabada","La Antigua","Apazapan","Aquila","Astacinga","Atlahuilco","Atoyac","Atzacan","Atzalan","Tlaltetela","Ayahualulco","Banderilla","Benito Juárez","Boca del Río","Calcahualco","Camerino Z. Mendoza","Carrillo Puerto","Catemaco","Cazones de Herrera","Cerro Azul","Citlaltépetl","Coacoatzintla","Coahuitlán","Coatepec","Coatzacoalcos","Coatzintla","Coetzala","Colipa","Comapa","Córdoba","Cosamaloapan de Carpio","Cosautlán de Carvajal","Coscomatepec","Cosoleacaque","Cotaxtla","Coxquihui","Coyutla","Cuichapa","Cuitláhuac","Chacaltianguis","Chalma","Chiconamel","Chiconquiaco","Chicontepec","Chinameca","Chinampa de Gorostiza","Las Choapas","Chocamán","Chontla","Chumatlán","Emiliano Zapata","Espinal","Filomeno Mata","Fortín","Gutiérrez Zamora","Hidalgotitlán","Huatusco","Huayacocotla","Hueyapan de Ocampo","Huiloapan de Cuauhtémoc","Ignacio de la Llave","Ilamatlán","Isla","Ixcatepec","Ixhuacán de los Reyes","Ixhuatlán del Café","Ixhuatlancillo","Ixhuatlán del Sureste","Ixhuatlán de Madero","Ixmatlahuacan","Ixtaczoquitlán","Jalacingo","Xalapa","Jalcomulco","Jáltipan","Jamapa","Jesús Carranza","Xico","Jilotepec","Juan Rodríguez Clara","Juchique de Ferrer","Landero y Coss","Lerdo de Tejada","Magdalena","Maltrata","Manlio Fabio Altamirano","Mariano Escobedo","Martínez de la Torre","Mecatlán","Mecayapan","Medellín de Bravo","Miahuatlán","Las Minas","Minatitlán","Misantla","Mixtla de Altamirano","Moloacán","Naolinco","Naranjal","Nautla","Nogales","Oluta","Omealca","Orizaba","Otatitlán","Oteapan","Ozuluama de Mascareñas","Pajapan","Pánuco","Papantla","Paso del Macho","Paso de Ovejas","La Perla","Perote","Platón Sánchez","Playa Vicente","Poza Rica de Hidalgo","Las Vigas de Ramírez","Pueblo Viejo","Puente Nacional","Rafael Delgado","Rafael Lucio","Los Reyes","Río Blanco","Saltabarranca","San Andrés Tenejapan","San Andrés Tuxtla","San Juan Evangelista","Santiago Tuxtla","Sayula de Alemán","Soconusco","Sochiapa","Soledad Atzompa","Soledad de Doblado","Soteapan","Tamalín","Tamiahua","Tampico Alto","Tancoco","Tantima","Tantoyuca","Tatatila","Castillo de Teayo","Tecolutla","Tehuipango","Álamo Temapache","Tempoal","Tenampa","Tenochtitlán","Teocelo","Tepatlaxco","Tepetlán","Tepetzintla","Tequila","José Azueta","Texcatepec","Texhuacán","Texistepec","Tezonapa","Tierra Blanca","Tihuatlán","Tlacojalpan","Tlacolulan","Tlacotalpan","Tlacotepec de Mejía","Tlachichilco","Tlalixcoyan","Tlalnelhuayocan","Tlapacoyan","Tlaquilpa","Tlilapan","Tomatlán","Tonayán","Totutla","Tuxpan","Tuxtilla","Ursulo Galván","Vega de Alatorre","Veracruz","Villa Aldama","Xoxocotla","Yanga","Yecuatla","Zacualpan","Zaragoza","Zentla","Zongolica","Zontecomatlán de López y Fuentes","Zozocolco de Hidalgo","Agua Dulce","El Higo","Nanchital de Lázaro Cárdenas del Río","Tres Valles","Carlos A. Carrillo","Tatahuicapan de Juárez","Uxpanapa","San Rafael","Santiago Sochiapan"],"Yucatán":["Abalá","Acanceh","Akil","Baca","Bokobá","Buctzotz","Cacalchén","Calotmul","Cansahcab","Cantamayec","Celestún","Cenotillo","Conkal","Cuncunul","Cuzamá","Chacsinkín","Chankom","Chapab","Chemax","Chicxulub Pueblo","Chichimilá","Chikindzonot","Chocholá","Chumayel","Dzán","Dzemul","Dzidzantún","Dzilam de Bravo","Dzilam González","Dzitás","Dzoncauich","Espita","Halachó","Hocabá","Hoctún","Homún","Huhí","Hunucmá","Ixil","Izamal","Kanasín","Kantunil","Kaua","Kinchil","Kopomá","Mama","Maní","Maxcanú","Mayapán","Mérida","Mocochá","Motul","Muna","Muxupip","Opichén","Oxkutzcab","Panabá","Peto","Progreso","Quintana Roo","Río Lagartos","Sacalum","Samahil","Sanahcat","San Felipe","Santa Elena","Seyé","Sinanché","Sotuta","Sucilá","Sudzal","Suma","Tahdziú","Tahmek","Teabo","Tecoh","Tekal de Venegas","Tekantó","Tekax","Tekit","Tekom","Telchac Pueblo","Telchac Puerto","Temax","Temozón","Tepakán","Tetiz","Teya","Ticul","Timucuy","Tinum","Tixcacalcupul","Tixkokob","Tixmehuac","Tixpéhual","Tizimín","Tunkás","Tzucacab","Uayma","Ucú","Umán","Valladolid","Xocchel","Yaxcabá","Yaxkukul","Yobaín"],"Zacatecas":["Apozol","Apulco","Atolinga","Benito Juárez","Calera","Cañitas de Felipe Pescador","Concepción del Oro","Cuauhtémoc","Chalchihuites","Fresnillo","Trinidad García de la Cadena","Genaro Codina","General Enrique Estrada","General Francisco R. Murguía","El Plateado de Joaquín Amaro","General Pánfilo Natera","Guadalupe","Huanusco","Jalpa","Jerez","Jiménez del Teul","Juan Aldama","Juchipila","Loreto","Luis Moya","Mazapil","Melchor Ocampo","Mezquital del Oro","Miguel Auza","Momax","Monte Escobedo","Morelos","Moyahua de Estrada","Nochistlán de Mejía","Noria de Ángeles","Ojocaliente","Pánuco","Pinos","Río Grande","Sain Alto","El Salvador","Sombrerete","Susticacán","Tabasco","Tepechitlán","Tepetongo","Teúl de González Ortega","Tlaltenango de Sánchez Román","Valparaíso","Vetagrande","Villa de Cos","Villa García","Villa González Ortega","Villa Hidalgo","Villanueva","Zacatecas","Trancoso","Santa María de la Paz"]}');
 
 /***/ })
 
