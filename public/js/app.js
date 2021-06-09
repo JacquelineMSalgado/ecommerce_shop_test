@@ -1945,6 +1945,60 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component landing mounted.');
@@ -1954,18 +2008,46 @@ __webpack_require__.r(__webpack_exports__);
       products: [],
       cartNumber: 0,
       cartObject: [],
+      cartObjectJSON: [],
       icons: ['mdi-facebook', 'mdi-twitter', 'mdi-linkedin', 'mdi-instagram'],
-      loading: false,
+      loading: 0,
       text: 'home',
       snackbar: false,
       textSnackBar: '',
-      timeout: 5000
+      timeout: 5000,
+      menu: false,
+      headers: [{
+        text: '',
+        value: 'picture',
+        align: 'center'
+      }, {
+        text: 'NAME',
+        value: 'name',
+        align: 'center'
+      }, {
+        text: 'QUANTITY',
+        value: 'quantity',
+        align: 'center'
+      }, {
+        text: 'UNIT PRICE',
+        value: 'price',
+        align: 'center'
+      }, {
+        text: 'TOTAL',
+        value: 'total',
+        align: 'center'
+      }, {
+        text: '',
+        value: 'actions',
+        sortable: false,
+        align: 'center'
+      }]
     };
   },
   created: function created() {
     var _this = this;
 
-    axios.get('/products').then(function (res) {
+    axios.get('/api/products').then(function (res) {
       _this.products = res.data;
     });
     this.getCartContent();
@@ -1974,12 +2056,25 @@ __webpack_require__.r(__webpack_exports__);
     addCart: function addCart($id) {
       var _this2 = this;
 
-      this.loading = true;
+      this.loading = $id;
       axios.get('/add-to-cart/' + $id).then(function (res) {
         if (res.status == 200) {
-          _this2.loading = false;
+          _this2.loading = 0;
           _this2.snackbar = true;
           _this2.textSnackBar = 'You added the product correctly. Check to your cart.';
+        }
+      });
+      this.getCartContent();
+    },
+    deleteItemCart: function deleteItemCart($id) {
+      var _this3 = this;
+
+      this.loading = $id;
+      axios.get('/remove-item-cart/' + $id).then(function (res) {
+        if (res.status == 200) {
+          _this3.loading = 0;
+          _this3.snackbar = true;
+          _this3.textSnackBar = 'You delete the product correctly. Check to your cart.';
         }
       });
       this.getCartContent();
@@ -1988,11 +2083,14 @@ __webpack_require__.r(__webpack_exports__);
       window.location.href = route;
     },
     getCartContent: function getCartContent() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios.get('/get-cart').then(function (res) {
-        _this3.cartObject = res.data;
-        _this3.cartNumber = Object.keys(_this3.cartObject).length;
+        _this4.cartObject = res.data;
+        console.log(_this4.cartObject);
+        _this4.cartNumber = Object.keys(_this4.cartObject).length;
+        _this4.cartObjectJSON = Object.values(_this4.cartObject);
+        console.log(_this4.cartObjectJSON);
       });
     }
   }
@@ -37721,28 +37819,235 @@ var render = function() {
               ),
               _vm._v(" "),
               _c(
-                "v-btn",
+                "v-menu",
                 {
-                  attrs: { icon: "" },
-                  on: {
-                    click: function($event) {
-                      return _vm.goToSite("/checkout")
+                  attrs: {
+                    "close-on-content-click": false,
+                    "nudge-width": 200,
+                    "offset-x": ""
+                  },
+                  scopedSlots: _vm._u([
+                    {
+                      key: "activator",
+                      fn: function(ref) {
+                        var on = ref.on
+                        var attrs = ref.attrs
+                        return [
+                          _c(
+                            "v-btn",
+                            _vm._g(
+                              _vm._b(
+                                { attrs: { icon: "" } },
+                                "v-btn",
+                                attrs,
+                                false
+                              ),
+                              on
+                            ),
+                            [
+                              _vm.cartNumber > 0
+                                ? _c(
+                                    "v-badge",
+                                    {
+                                      attrs: {
+                                        color: "green",
+                                        content: _vm.cartNumber
+                                      }
+                                    },
+                                    [_c("v-icon", [_vm._v("mdi-cart ")])],
+                                    1
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.cartNumber == 0
+                                ? _c("v-icon", [_vm._v(" mdi-cart ")])
+                                : _vm._e()
+                            ],
+                            1
+                          )
+                        ]
+                      }
                     }
+                  ]),
+                  model: {
+                    value: _vm.menu,
+                    callback: function($$v) {
+                      _vm.menu = $$v
+                    },
+                    expression: "menu"
                   }
                 },
                 [
-                  _vm.cartNumber > 0
-                    ? _c(
-                        "v-badge",
-                        { attrs: { color: "green", content: _vm.cartNumber } },
-                        [_c("v-icon", [_vm._v("mdi-cart ")])],
-                        1
-                      )
-                    : _vm._e(),
                   _vm._v(" "),
-                  _vm.cartNumber == 0
-                    ? _c("v-icon", [_vm._v(" mdi-cart ")])
-                    : _vm._e()
+                  _c(
+                    "v-card",
+                    [
+                      _c(
+                        "v-list",
+                        [
+                          _c(
+                            "v-list-item",
+                            [
+                              _c("v-list-item-avatar", [
+                                _c("img", {
+                                  attrs: {
+                                    src:
+                                      "https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png",
+                                    alt: "John"
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "v-list-item-content",
+                                [
+                                  _c("v-list-item-title", [
+                                    _vm._v("Shopping Cart")
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("v-list-item-subtitle", [
+                                    _vm._v("Products")
+                                  ])
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-list-item-action",
+                                [
+                                  _c(
+                                    "v-btn",
+                                    {
+                                      attrs: { color: "primary" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.goToSite("/checkout")
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("v-icon", { attrs: { left: "" } }, [
+                                        _vm._v("mdi-check-outline")
+                                      ]),
+                                      _vm._v(
+                                        " CHECK OUT\n                                "
+                                      )
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("v-data-table", {
+                        staticClass: "elevation-1",
+                        attrs: {
+                          headers: _vm.headers,
+                          items: _vm.cartObjectJSON,
+                          "hide-default-footer": ""
+                        },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "item.picture",
+                              fn: function(ref) {
+                                var item = ref.item
+                                return [
+                                  _c("v-list-item-avatar", [
+                                    _c("img", {
+                                      attrs: {
+                                        src:
+                                          "data:image/png;base64," +
+                                          item.picture,
+                                        alt: item.picture
+                                      }
+                                    })
+                                  ])
+                                ]
+                              }
+                            },
+                            {
+                              key: "item.actions",
+                              fn: function(ref) {
+                                var item = ref.item
+                                return [
+                                  _c(
+                                    "v-icon",
+                                    {
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.addCart(item.id)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v(" mdi-plus ")]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-icon",
+                                    {
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.deleteItemCart(item.id)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v(" mdi-delete ")]
+                                  )
+                                ]
+                              }
+                            },
+                            {
+                              key: "item.price",
+                              fn: function(ref) {
+                                var item = ref.item
+                                return [
+                                  _vm._v(
+                                    "\n                            $ " +
+                                      _vm._s(item.price) +
+                                      "\n                        "
+                                  )
+                                ]
+                              }
+                            },
+                            {
+                              key: "item.total",
+                              fn: function(ref) {
+                                var item = ref.item
+                                return [
+                                  _vm._v(
+                                    "\n                            $ " +
+                                      _vm._s(item.total) +
+                                      "\n                        "
+                                  )
+                                ]
+                              }
+                            },
+                            {
+                              key: "no-data",
+                              fn: function() {
+                                return [
+                                  _vm._v(
+                                    "\n                            You don't have products added\n                        "
+                                  )
+                                ]
+                              },
+                              proxy: true
+                            }
+                          ],
+                          null,
+                          true
+                        )
+                      })
+                    ],
+                    1
+                  )
                 ],
                 1
               ),
@@ -37810,7 +38115,7 @@ var render = function() {
                               {
                                 staticClass: "mx-auto my-12",
                                 attrs: {
-                                  loading: _vm.loading,
+                                  loading: _vm.loading == item.id,
                                   "max-width": "374"
                                 }
                               },
@@ -37821,7 +38126,7 @@ var render = function() {
                                   [
                                     _c("v-progress-linear", {
                                       attrs: {
-                                        color: "deep-purple",
+                                        color: "primary",
                                         height: "10",
                                         indeterminate: ""
                                       }
@@ -37894,6 +38199,7 @@ var render = function() {
                                 _vm._v(" "),
                                 _c(
                                   "v-card-actions",
+                                  { staticClass: "justify-center" },
                                   [
                                     _c(
                                       "v-btn",
@@ -37906,24 +38212,88 @@ var render = function() {
                                       [_vm._v(" READ MORE ")]
                                     ),
                                     _vm._v(" "),
-                                    _c(
-                                      "v-btn",
-                                      {
-                                        attrs: {
-                                          color: "cyan",
-                                          elevation: "2",
-                                          text: ""
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.addCart(item.id)
-                                          }
-                                        }
-                                      },
-                                      [_vm._v(" ADD TO CART ")]
-                                    )
+                                    !_vm.cartObject.hasOwnProperty(item.id)
+                                      ? _c(
+                                          "v-btn",
+                                          {
+                                            attrs: {
+                                              depressed: "",
+                                              color: "primary",
+                                              elevation: "2"
+                                            },
+                                            on: {
+                                              click: function($event) {
+                                                return _vm.addCart(item.id)
+                                              }
+                                            }
+                                          },
+                                          [
+                                            _c(
+                                              "v-icon",
+                                              { attrs: { left: "" } },
+                                              [_vm._v(" mdi-cart ")]
+                                            ),
+                                            _vm._v(
+                                              " ADD TO CART \n                                "
+                                            )
+                                          ],
+                                          1
+                                        )
+                                      : [
+                                          _c(
+                                            "v-btn",
+                                            {
+                                              attrs: {
+                                                depressed: "",
+                                                color: "primary",
+                                                elevation: "2"
+                                              },
+                                              on: {
+                                                click: function($event) {
+                                                  return _vm.addCart(item.id)
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _c(
+                                                "v-icon",
+                                                { attrs: { left: "" } },
+                                                [_vm._v(" mdi-cart ")]
+                                              ),
+                                              _vm._v(
+                                                " + 1\n                                    "
+                                              )
+                                            ],
+                                            1
+                                          ),
+                                          _vm._v(" "),
+                                          _c(
+                                            "v-btn",
+                                            {
+                                              attrs: {
+                                                depressed: "",
+                                                color: "error"
+                                              },
+                                              on: {
+                                                click: function($event) {
+                                                  return _vm.deleteItemCart(
+                                                    item.id
+                                                  )
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _c(
+                                                "v-icon",
+                                                { attrs: { left: "" } },
+                                                [_vm._v(" mdi-delete ")]
+                                              )
+                                            ],
+                                            1
+                                          )
+                                        ]
                                   ],
-                                  1
+                                  2
                                 )
                               ],
                               2

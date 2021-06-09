@@ -99,6 +99,7 @@ class ProductController extends Controller
         if(!$cart) {
             $cart = [
                 $id => [
+                    "id" => $product->id,
                     "name" => $product->name,
                     "quantity" => 1,
                     "slug" => $product->slug,
@@ -106,6 +107,7 @@ class ProductController extends Controller
                     "price" => $product->price,
                     "picture" => $product->picture,
                     "status" => $product->status,
+                    "total" => $product->price
                 ]
             ];
 
@@ -117,12 +119,14 @@ class ProductController extends Controller
         // if cart not empty then check if this product exist then increment quantity
         if(isset($cart[$id])) {
             $cart[$id]['quantity']++;
+            $cart[$id]['total']=$cart[$id]['price']*$cart[$id]['quantity'];
             session()->put('cart', $cart);
             return redirect()->back()->with('success', 'Product added to cart successfully!');
         }
 
         // if item not exist in cart then add to cart with quantity = 1
         $cart[$id] = [
+            "id" => $product->id,
             "name" => $product->name,
             "quantity" => 1,
             "slug" => $product->slug,
@@ -130,6 +134,7 @@ class ProductController extends Controller
             "price" => $product->price,
             "picture" => $product->picture,
             "status" => $product->status,
+            "total" => $product->price
         ];
 
         session()->put('cart', $cart);

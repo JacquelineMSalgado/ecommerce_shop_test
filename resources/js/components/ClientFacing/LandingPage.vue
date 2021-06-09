@@ -15,10 +15,54 @@
 
                 <v-btn value="contact" :href="'#' + text"> CONTACT </v-btn>
 
-                <v-btn icon @click="goToSite('/checkout')">
-                    <v-badge color="green" v-if="cartNumber > 0" :content="cartNumber"><v-icon>mdi-cart </v-icon></v-badge>
-                    <v-icon v-if="cartNumber == 0"> mdi-cart </v-icon>
-                </v-btn>
+                <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn icon v-bind="attrs" v-on="on">
+                            <v-badge color="green" v-if="cartNumber > 0" :content="cartNumber"><v-icon>mdi-cart </v-icon></v-badge>
+                            <v-icon v-if="cartNumber == 0"> mdi-cart </v-icon>
+                        </v-btn>
+                    </template>
+                    <v-card>
+                        <v-list>
+                            <v-list-item>
+                                <v-list-item-avatar>
+                                        <img src="https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png" alt="John">
+                                </v-list-item-avatar>
+
+                                <v-list-item-content>
+                                    <v-list-item-title>Shopping Cart</v-list-item-title>
+                                    <v-list-item-subtitle>Products</v-list-item-subtitle>
+                                </v-list-item-content>
+
+                                <v-list-item-action>
+                                    <v-btn color="primary" @click="goToSite('/checkout')">
+                                        <v-icon left>mdi-check-outline</v-icon> CHECK OUT
+                                    </v-btn>
+                                </v-list-item-action>
+                            </v-list-item>
+                        </v-list>
+                        <v-data-table :headers="headers" :items="cartObjectJSON" hide-default-footer class="elevation-1">
+                            <template v-slot:[`item.picture`]="{ item }">
+                                <v-list-item-avatar>
+                                    <img :src="'data:image/png;base64,' + item.picture" :alt="item.picture">
+                                </v-list-item-avatar>
+                            </template>
+                            <template v-slot:[`item.actions`]="{ item }">
+                                <v-icon @click="addCart(item.id)"> mdi-plus </v-icon>
+                                <v-icon @click="deleteItemCart(item.id)"> mdi-delete </v-icon>
+                            </template>
+                            <template v-slot:[`item.price`]="{ item }">
+                                $ {{ item.price }}
+                            </template>
+                            <template v-slot:[`item.total`]="{ item }">
+                                $ {{ item.total }}
+                            </template>
+                            <template v-slot:no-data>
+                                You don't have products added
+                            </template>
+                        </v-data-table>
+                    </v-card>
+                </v-menu>
 
                 <v-btn value="login" @click="goToSite('/login')"> LOG IN </v-btn>
             </v-btn-toggle>
@@ -36,9 +80,9 @@
                     <v-row>
                         <v-spacer></v-spacer>
                         <v-col v-for="(item, index) in products" :key="index" cols="12" sm="6" md="4">
-                            <v-card :loading="loading" class="mx-auto my-12" max-width="374">
+                            <v-card :loading="loading == item.id" class="mx-auto my-12" max-width="374">
                                 <template slot="progress">
-                                    <v-progress-linear color="deep-purple" height="10" indeterminate></v-progress-linear>
+                                    <v-progress-linear color="primary" height="10" indeterminate></v-progress-linear>
                                 </template>
 
                                 <v-img height="250" :src="'data:image/png;base64,' + item.picture"></v-img>
@@ -59,9 +103,19 @@
 
                                 <v-divider class="mx-4"></v-divider>
 
-                                <v-card-actions>
+                                <v-card-actions class="justify-center">
                                     <v-btn color="deep lighten-2" text> READ MORE </v-btn>
-                                    <v-btn color="cyan" elevation="2" text @click="addCart(item.id)"> ADD TO CART </v-btn>
+                                    <v-btn v-if="!cartObject.hasOwnProperty(item.id)" depressed color="primary" elevation="2" @click="addCart(item.id)">       
+                                        <v-icon left> mdi-cart </v-icon> ADD TO CART 
+                                    </v-btn>
+                                    <template v-else>
+                                        <v-btn  depressed color="primary" elevation="2" @click="addCart(item.id)">       
+                                            <v-icon left> mdi-cart </v-icon> + 1
+                                        </v-btn>
+                                        <v-btn depressed color="error" @click="deleteItemCart(item.id)">       
+                                            <v-icon left> mdi-delete </v-icon>
+                                        </v-btn>
+                                    </template>
                                 </v-card-actions>
                             </v-card>
                         </v-col>
@@ -107,32 +161,78 @@
             products: [],
             cartNumber: 0,
             cartObject: [],
+            cartObjectJSON: [],
             icons: [
                 'mdi-facebook',
                 'mdi-twitter',
                 'mdi-linkedin',
                 'mdi-instagram',
             ],
-            loading: false,
+            loading: 0,
             text: 'home',
             snackbar: false,
             textSnackBar: '',
             timeout: 5000,
+            menu: false,
+            headers: [
+                {
+                    text: '',
+                    value: 'picture',
+                    align: 'center',
+                },
+                {
+                    text: 'NAME',
+                    value: 'name',
+                    align: 'center',
+                },
+                {
+                    text: 'QUANTITY',
+                    value: 'quantity',
+                    align: 'center',
+                },
+                {
+                    text: 'UNIT PRICE',
+                    value: 'price',
+                    align: 'center',
+                },
+                {
+                    text: 'TOTAL',
+                    value: 'total',
+                    align: 'center',
+                },
+                { 
+                    text: '', 
+                    value: 'actions', 
+                    sortable: false,
+                    align: 'center',
+                },
+            ],
         }),
         created(){
-            axios.get('/products').then(res=>{
+            axios.get('/api/products').then(res=>{
                 this.products = res.data;
             });
             this.getCartContent();
         },
         methods: {
             addCart($id) {
-                this.loading = true
+                this.loading = $id;
                 axios.get('/add-to-cart/' + $id).then(res=>{
                     if(res.status == 200) {
-                        this.loading = false;
+                        this.loading = 0;
                         this.snackbar = true;
                         this.textSnackBar = 'You added the product correctly. Check to your cart.'
+                    }
+                });
+                this.getCartContent();
+            },
+            deleteItemCart($id) {
+                this.loading = $id;
+                axios.get('/remove-item-cart/' + $id).then(res=>{
+                    if(res.status == 200) {
+                        this.loading = 0;
+                        this.snackbar = true;
+                        this.textSnackBar = 'You delete the product correctly. Check to your cart.'
                     }
                 });
                 this.getCartContent();
@@ -143,7 +243,10 @@
             getCartContent() {
                 axios.get('/get-cart').then(res=>{
                     this.cartObject = res.data;
+                    console.log(this.cartObject);
                     this.cartNumber = Object.keys(this.cartObject).length;
+                    this.cartObjectJSON = Object.values(this.cartObject);
+                    console.log(this.cartObjectJSON);
                 });
             }
         },

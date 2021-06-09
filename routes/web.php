@@ -24,7 +24,7 @@ Route::group(['middleware' => ['guest']], function() {
         return 'Check out';
     });
 
-    Route::resource('/products', ProductController::class);
+    Route::resource('/api/products', ProductController::class);
     Route::get('/add-to-cart/{id}', [App\Http\Controllers\ProductController::class, 'addToCart']);
     Route::get('/get-cart', [App\Http\Controllers\ProductController::class, 'getCart']);
     Route::get('/remove-item-cart/{id}', [App\Http\Controllers\ProductController::class, 'removeItemToCart']);
