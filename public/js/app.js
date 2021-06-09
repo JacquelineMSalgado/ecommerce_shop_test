@@ -2057,7 +2057,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       this.loading = $id;
-      axios.get('/add-to-cart/' + $id).then(function (res) {
+      axios.get('/api/addItemCart/' + $id).then(function (res) {
         if (res.status == 200) {
           _this2.loading = 0;
           _this2.snackbar = true;
@@ -2070,7 +2070,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       this.loading = $id;
-      axios.get('/remove-item-cart/' + $id).then(function (res) {
+      axios.get('/api/removeItemCart/' + $id).then(function (res) {
         if (res.status == 200) {
           _this3.loading = 0;
           _this3.snackbar = true;
@@ -2085,12 +2085,10 @@ __webpack_require__.r(__webpack_exports__);
     getCartContent: function getCartContent() {
       var _this4 = this;
 
-      axios.get('/get-cart').then(function (res) {
+      axios.get('/api/productsCart').then(function (res) {
         _this4.cartObject = res.data;
-        console.log(_this4.cartObject);
         _this4.cartNumber = Object.keys(_this4.cartObject).length;
         _this4.cartObjectJSON = Object.values(_this4.cartObject);
-        console.log(_this4.cartObjectJSON);
       });
     }
   }

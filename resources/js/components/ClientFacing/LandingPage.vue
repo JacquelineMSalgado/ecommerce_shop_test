@@ -217,7 +217,7 @@
         methods: {
             addCart($id) {
                 this.loading = $id;
-                axios.get('/add-to-cart/' + $id).then(res=>{
+                axios.get('/api/addItemCart/' + $id).then(res=>{
                     if(res.status == 200) {
                         this.loading = 0;
                         this.snackbar = true;
@@ -228,7 +228,7 @@
             },
             deleteItemCart($id) {
                 this.loading = $id;
-                axios.get('/remove-item-cart/' + $id).then(res=>{
+                axios.get('/api/removeItemCart/' + $id).then(res=>{
                     if(res.status == 200) {
                         this.loading = 0;
                         this.snackbar = true;
@@ -241,12 +241,10 @@
                 window.location.href = route;
             },
             getCartContent() {
-                axios.get('/get-cart').then(res=>{
+                axios.get('/api/productsCart').then(res=>{
                     this.cartObject = res.data;
-                    console.log(this.cartObject);
                     this.cartNumber = Object.keys(this.cartObject).length;
                     this.cartObjectJSON = Object.values(this.cartObject);
-                    console.log(this.cartObjectJSON);
                 });
             }
         },

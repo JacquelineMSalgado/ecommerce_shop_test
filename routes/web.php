@@ -25,9 +25,9 @@ Route::group(['middleware' => ['guest']], function() {
     });
 
     Route::resource('/api/products', ProductController::class);
-    Route::get('/add-to-cart/{id}', [App\Http\Controllers\ProductController::class, 'addToCart']);
-    Route::get('/get-cart', [App\Http\Controllers\ProductController::class, 'getCart']);
-    Route::get('/remove-item-cart/{id}', [App\Http\Controllers\ProductController::class, 'removeItemToCart']);
+    Route::get('/api/addItemCart/{id}', [App\Http\Controllers\ProductController::class, 'addToCart']);
+    Route::get('/api/productsCart', [App\Http\Controllers\ProductController::class, 'getCart']);
+    Route::get('/api/removeItemCart/{id}', [App\Http\Controllers\ProductController::class, 'removeItemToCart']);
 });
 
 //MIDDLEWARE GROUP: AUTHENTICATED (USERS AUTHENTICATED)
