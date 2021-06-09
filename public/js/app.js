@@ -1938,6 +1938,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component landing mounted.');
@@ -1945,9 +1952,14 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       products: [],
+      cartNumber: 0,
+      cartObject: [],
       icons: ['mdi-facebook', 'mdi-twitter', 'mdi-linkedin', 'mdi-instagram'],
       loading: false,
-      text: 'home'
+      text: 'home',
+      snackbar: false,
+      textSnackBar: '',
+      timeout: 5000
     };
   },
   created: function created() {
@@ -1955,20 +1967,33 @@ __webpack_require__.r(__webpack_exports__);
 
     axios.get('/products').then(function (res) {
       _this.products = res.data;
-      console.log(_this.products);
     });
+    this.getCartContent();
   },
   methods: {
-    reserve: function reserve() {
+    addCart: function addCart($id) {
       var _this2 = this;
 
       this.loading = true;
-      setTimeout(function () {
-        return _this2.loading = false;
-      }, 2000);
+      axios.get('/add-to-cart/' + $id).then(function (res) {
+        if (res.status == 200) {
+          _this2.loading = false;
+          _this2.snackbar = true;
+          _this2.textSnackBar = 'You added the product correctly. Check to your cart.';
+        }
+      });
+      this.getCartContent();
     },
     goToSite: function goToSite(route) {
       window.location.href = route;
+    },
+    getCartContent: function getCartContent() {
+      var _this3 = this;
+
+      axios.get('/get-cart').then(function (res) {
+        _this3.cartObject = res.data;
+        _this3.cartNumber = Object.keys(_this3.cartObject).length;
+      });
     }
   }
 });
@@ -37698,6 +37723,33 @@ var render = function() {
               _c(
                 "v-btn",
                 {
+                  attrs: { icon: "" },
+                  on: {
+                    click: function($event) {
+                      return _vm.goToSite("/checkout")
+                    }
+                  }
+                },
+                [
+                  _vm.cartNumber > 0
+                    ? _c(
+                        "v-badge",
+                        { attrs: { color: "green", content: _vm.cartNumber } },
+                        [_c("v-icon", [_vm._v("mdi-cart ")])],
+                        1
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.cartNumber == 0
+                    ? _c("v-icon", [_vm._v(" mdi-cart ")])
+                    : _vm._e()
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-btn",
+                {
                   attrs: { value: "login" },
                   on: {
                     click: function($event) {
@@ -37708,20 +37760,6 @@ var render = function() {
                 [_vm._v(" LOG IN ")]
               )
             ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-btn",
-            {
-              attrs: { icon: "" },
-              on: {
-                click: function($event) {
-                  return _vm.goToSite("/checkout")
-                }
-              }
-            },
-            [_c("v-icon", [_vm._v("mdi-cart ")])],
             1
           )
         ],
@@ -37863,8 +37901,7 @@ var render = function() {
                                         attrs: {
                                           color: "deep lighten-2",
                                           text: ""
-                                        },
-                                        on: { click: _vm.reserve }
+                                        }
                                       },
                                       [_vm._v(" READ MORE ")]
                                     ),
@@ -37877,7 +37914,11 @@ var render = function() {
                                           elevation: "2",
                                           text: ""
                                         },
-                                        on: { click: _vm.reserve }
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.addCart(item.id)
+                                          }
+                                        }
                                       },
                                       [_vm._v(" ADD TO CART ")]
                                     )
@@ -37961,6 +38002,48 @@ var render = function() {
           )
         ],
         1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-snackbar",
+        {
+          attrs: { timeout: _vm.timeout },
+          scopedSlots: _vm._u([
+            {
+              key: "action",
+              fn: function(ref) {
+                var attrs = ref.attrs
+                return [
+                  _c(
+                    "v-btn",
+                    _vm._b(
+                      {
+                        attrs: { color: "blue", text: "" },
+                        on: {
+                          click: function($event) {
+                            _vm.snackbar = false
+                          }
+                        }
+                      },
+                      "v-btn",
+                      attrs,
+                      false
+                    ),
+                    [_vm._v(" Close ")]
+                  )
+                ]
+              }
+            }
+          ]),
+          model: {
+            value: _vm.snackbar,
+            callback: function($$v) {
+              _vm.snackbar = $$v
+            },
+            expression: "snackbar"
+          }
+        },
+        [_vm._v(" " + _vm._s(_vm.textSnackBar) + "\n        ")]
       )
     ],
     1

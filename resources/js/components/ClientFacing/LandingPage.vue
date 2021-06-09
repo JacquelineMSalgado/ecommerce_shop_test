@@ -15,12 +15,13 @@
 
                 <v-btn value="contact" :href="'#' + text"> CONTACT </v-btn>
 
+                <v-btn icon @click="goToSite('/checkout')">
+                    <v-badge color="green" v-if="cartNumber > 0" :content="cartNumber"><v-icon>mdi-cart </v-icon></v-badge>
+                    <v-icon v-if="cartNumber == 0"> mdi-cart </v-icon>
+                </v-btn>
+
                 <v-btn value="login" @click="goToSite('/login')"> LOG IN </v-btn>
             </v-btn-toggle>
-
-            <v-btn icon @click="goToSite('/checkout')">
-                <v-icon>mdi-cart </v-icon>
-            </v-btn>
         </v-app-bar>
 
         <!-- Sizes your content based upon application components -->
@@ -59,8 +60,8 @@
                                 <v-divider class="mx-4"></v-divider>
 
                                 <v-card-actions>
-                                    <v-btn color="deep lighten-2" text @click="reserve"> READ MORE </v-btn>
-                                    <v-btn color="cyan" elevation="2" text @click="reserve"> ADD TO CART </v-btn>
+                                    <v-btn color="deep lighten-2" text> READ MORE </v-btn>
+                                    <v-btn color="cyan" elevation="2" text @click="addCart(item.id)"> ADD TO CART </v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-col>
@@ -88,6 +89,12 @@
                 </v-card-text>
             </v-card>
         </v-footer>
+
+        <v-snackbar v-model="snackbar" :timeout="timeout"> {{ textSnackBar }}
+            <template v-slot:action="{ attrs }">
+                <v-btn color="blue" text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
     </v-app>
 </template>
 
@@ -98,6 +105,8 @@
         },
         data: () => ({
             products: [],
+            cartNumber: 0,
+            cartObject: [],
             icons: [
                 'mdi-facebook',
                 'mdi-twitter',
@@ -106,22 +115,37 @@
             ],
             loading: false,
             text: 'home',
+            snackbar: false,
+            textSnackBar: '',
+            timeout: 5000,
         }),
         created(){
             axios.get('/products').then(res=>{
                 this.products = res.data;
-                console.log(this.products);
             });
+            this.getCartContent();
         },
         methods: {
-            reserve () {
+            addCart($id) {
                 this.loading = true
-
-                setTimeout(() => (this.loading = false), 2000)
+                axios.get('/add-to-cart/' + $id).then(res=>{
+                    if(res.status == 200) {
+                        this.loading = false;
+                        this.snackbar = true;
+                        this.textSnackBar = 'You added the product correctly. Check to your cart.'
+                    }
+                });
+                this.getCartContent();
             },
             goToSite(route) {
                 window.location.href = route;
             },
+            getCartContent() {
+                axios.get('/get-cart').then(res=>{
+                    this.cartObject = res.data;
+                    this.cartNumber = Object.keys(this.cartObject).length;
+                });
+            }
         },
     }
 </script>
