@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,8 @@ Route::group(['middleware' => ['guest']], function() {
     Route::get('/checkout', function() {
         return 'Check out';
     });
+
+    Route::resource('/products', ProductController::class);
 });
 
 //MIDDLEWARE GROUP: AUTHENTICATED (USERS AUTHENTICATED)

@@ -1938,37 +1938,33 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component landing mounted.');
   },
   data: function data() {
     return {
-      cards: ['Good', 'Best', 'Finest'],
+      products: [],
       icons: ['mdi-facebook', 'mdi-twitter', 'mdi-linkedin', 'mdi-instagram'],
       loading: false,
-      items: [{
-        src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'
-      }, {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg'
-      }, {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg'
-      }, {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg'
-      }],
       text: 'home'
     };
   },
+  created: function created() {
+    var _this = this;
+
+    axios.get('/products').then(function (res) {
+      _this.products = res.data;
+      console.log(_this.products);
+    });
+  },
   methods: {
     reserve: function reserve() {
-      var _this = this;
+      var _this2 = this;
 
       this.loading = true;
       setTimeout(function () {
-        return _this.loading = false;
+        return _this2.loading = false;
       }, 2000);
     },
     goToSite: function goToSite(route) {
@@ -37660,6 +37656,7 @@ var render = function() {
     [
       _c(
         "v-app-bar",
+        { staticClass: "sticky-top" },
         [
           _c("v-toolbar-title", [_vm._v("eCommerce Shop")]),
           _vm._v(" "),
@@ -37678,19 +37675,25 @@ var render = function() {
               }
             },
             [
-              _c("v-btn", { attrs: { value: "home" } }, [_vm._v(" HOME ")]),
-              _vm._v(" "),
-              _c("v-btn", { attrs: { value: "products" } }, [
-                _vm._v(" PRODUCTS ")
+              _c("v-btn", { attrs: { value: "home", href: "#" + _vm.text } }, [
+                _vm._v(" HOME ")
               ]),
               _vm._v(" "),
-              _c("v-btn", { attrs: { value: "about" } }, [
+              _c(
+                "v-btn",
+                { attrs: { value: "products", href: "#" + _vm.text } },
+                [_vm._v(" PRODUCTS ")]
+              ),
+              _vm._v(" "),
+              _c("v-btn", { attrs: { value: "about", href: "#" + _vm.text } }, [
                 _vm._v(" ABOUT US ")
               ]),
               _vm._v(" "),
-              _c("v-btn", { attrs: { value: "contact" } }, [
-                _vm._v(" CONTACT ")
-              ]),
+              _c(
+                "v-btn",
+                { attrs: { value: "contact", href: "#" + _vm.text } },
+                [_vm._v(" CONTACT ")]
+              ),
               _vm._v(" "),
               _c(
                 "v-btn",
@@ -37727,24 +37730,24 @@ var render = function() {
       _vm._v(" "),
       _c(
         "v-main",
+        { attrs: { id: "home" } },
         [
           _c(
             "v-carousel",
             { attrs: { "hide-delimiters": "", cycle: "" } },
-            _vm._l(_vm.items, function(item, i) {
-              return _c("v-carousel-item", { key: i, attrs: { src: item.src } })
+            _vm._l(_vm.products, function(item, i) {
+              return _c("v-carousel-item", {
+                key: i,
+                attrs: { src: "data:image/png;base64," + item.picture }
+              })
             }),
             1
           ),
           _vm._v(" "),
           _c(
             "v-container",
-            { attrs: { fluid: "" } },
+            { attrs: { fluid: "", id: "products" } },
             [
-              _c("div", { staticClass: "text-center" }, [
-                _c("h3", [_vm._v("ALL PRODUCTS")])
-              ]),
-              _vm._v(" "),
               _c("v-divider"),
               _vm._v(" "),
               _c(
@@ -37756,11 +37759,11 @@ var render = function() {
                     [
                       _c("v-spacer"),
                       _vm._v(" "),
-                      _vm._l(_vm.cards, function(card) {
+                      _vm._l(_vm.products, function(item, index) {
                         return _c(
                           "v-col",
                           {
-                            key: card,
+                            key: index,
                             attrs: { cols: "12", sm: "6", md: "4" }
                           },
                           [
@@ -37792,12 +37795,11 @@ var render = function() {
                                 _c("v-img", {
                                   attrs: {
                                     height: "250",
-                                    src:
-                                      "https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                                    src: "data:image/png;base64," + item.picture
                                   }
                                 }),
                                 _vm._v(" "),
-                                _c("v-card-title", [_vm._v("Cafe Badilico")]),
+                                _c("v-card-title", [_vm._v(_vm._s(item.name))]),
                                 _vm._v(" "),
                                 _c(
                                   "v-card-text",
@@ -37832,13 +37834,19 @@ var render = function() {
                                     _c(
                                       "div",
                                       { staticClass: "my-4 text-subtitle-1" },
-                                      [_vm._v(" $ • Italian, Cafe ")]
+                                      [
+                                        _vm._v(
+                                          " $" +
+                                            _vm._s(item.price) +
+                                            " USD • " +
+                                            _vm._s(item.slug) +
+                                            " "
+                                        )
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c("div", [
-                                      _vm._v(
-                                        "Small plates, salads & sandwiches - an intimate setting with 12 indoor seats plus patio seating."
-                                      )
+                                      _vm._v(_vm._s(item.description))
                                     ])
                                   ],
                                   1
@@ -37898,7 +37906,7 @@ var render = function() {
       _vm._v(" "),
       _c(
         "v-footer",
-        { attrs: { dark: "", padless: "" } },
+        { attrs: { dark: "", padless: "", id: "about" } },
         [
           _c(
             "v-card",
@@ -37930,7 +37938,7 @@ var render = function() {
               _vm._v(" "),
               _c("v-card-text", { staticClass: "white--text pt-0" }, [
                 _vm._v(
-                  "\n                Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.\n            "
+                  "\n                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni in error corrupti pariatur reprehenderit facere aliquid accusamus consequuntur, ex eligendi quam. Quidem cumque quaerat sit ea reiciendis velit beatae ratione.\n            "
                 )
               ]),
               _vm._v(" "),
@@ -37938,11 +37946,15 @@ var render = function() {
               _vm._v(" "),
               _c("v-card-text", { staticClass: "white--text" }, [
                 _vm._v(
-                  "\n                " +
+                  "\n                ® " +
                     _vm._s(new Date().getFullYear()) +
                     " — "
                 ),
-                _c("strong", [_vm._v("Vuetify")])
+                _c("strong", [
+                  _vm._v(
+                    "Jacqueline Mireya Salgado Rivas — jacquelinsalgado.2@gmail.com"
+                  )
+                ])
               ])
             ],
             1
