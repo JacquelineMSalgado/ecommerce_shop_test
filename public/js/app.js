@@ -1933,78 +1933,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component landing mounted.');
+    this.getCartContent();
   },
   data: function data() {
     return {
+      moduleData: 'home',
       products: [],
       cartNumber: 0,
       cartObject: [],
@@ -2050,7 +1986,6 @@ __webpack_require__.r(__webpack_exports__);
     axios.get('/api/products').then(function (res) {
       _this.products = res.data;
     });
-    this.getCartContent();
   },
   methods: {
     addCart: function addCart($id) {
@@ -2090,6 +2025,10 @@ __webpack_require__.r(__webpack_exports__);
         _this4.cartNumber = Object.keys(_this4.cartObject).length;
         _this4.cartObjectJSON = Object.values(_this4.cartObject);
       });
+      this.callChild();
+    },
+    callChild: function callChild() {
+      this.$refs.childRef1.getCartContent();
     }
   }
 });
@@ -2197,75 +2136,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ["product_id"],
   mounted: function mounted() {
     console.log('Component product details mounted.');
-    console.log(this.product_id);
     this.getCartContent();
   },
   data: function data() {
     return {
+      moduleData: 'product',
       product: [],
       cartNumber: 0,
       cartObject: [],
@@ -2351,6 +2230,10 @@ __webpack_require__.r(__webpack_exports__);
         _this4.cartNumber = Object.keys(_this4.cartObject).length;
         _this4.cartObjectJSON = Object.values(_this4.cartObject);
       });
+      this.callChild();
+    },
+    callChild: function callChild() {
+      this.$refs.childRef.getCartContent();
     }
   }
 });
@@ -2387,6 +2270,176 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component mounted.');
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Shared/MenuBarComponent.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Shared/MenuBarComponent.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: ["data"],
+  mounted: function mounted() {
+    this.getCartContent();
+  },
+  data: function data() {
+    return {
+      cartNumber: 0,
+      cartObject: [],
+      cartObjectJSON: [],
+      text: 'home',
+      menu: false,
+      headers: [{
+        text: '',
+        value: 'picture',
+        align: 'center'
+      }, {
+        text: 'NAME',
+        value: 'name',
+        align: 'center'
+      }, {
+        text: 'QUANTITY',
+        value: 'quantity',
+        align: 'center'
+      }, {
+        text: 'UNIT PRICE',
+        value: 'price',
+        align: 'center'
+      }, {
+        text: 'TOTAL',
+        value: 'total',
+        align: 'center'
+      }, {
+        text: '',
+        value: 'actions',
+        sortable: false,
+        align: 'center'
+      }]
+    };
+  },
+  methods: {
+    addCart: function addCart($id) {
+      var _this = this;
+
+      this.loading = $id;
+      axios.get('/api/addItemCart/' + $id).then(function (res) {
+        if (res.status == 200) {
+          _this.loading = 0;
+          _this.snackbar = true;
+          _this.textSnackBar = 'You added the product correctly. Check to your cart.';
+        }
+      });
+      this.getCartContent();
+      this.callParent();
+    },
+    deleteItemCart: function deleteItemCart($id) {
+      var _this2 = this;
+
+      this.loading = $id;
+      axios.get('/api/removeItemCart/' + $id).then(function (res) {
+        if (res.status == 200) {
+          _this2.loading = 0;
+          _this2.snackbar = true;
+          _this2.textSnackBar = 'You delete the product correctly. Check to your cart.';
+        }
+      });
+      this.getCartContent();
+      this.callParent();
+    },
+    goToSite: function goToSite(route) {
+      window.location.href = route;
+    },
+    getCartContent: function getCartContent() {
+      var _this3 = this;
+
+      axios.get('/api/productsCart').then(function (res) {
+        _this3.cartObject = res.data;
+        _this3.cartNumber = Object.keys(_this3.cartObject).length;
+        _this3.cartObjectJSON = Object.values(_this3.cartObject);
+      });
+    },
+    callParent: function callParent() {
+      this.$emit('onChange');
+    }
   }
 });
 
@@ -2434,6 +2487,7 @@ Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_2__.default);
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue").default);
 Vue.component('landing-page', __webpack_require__(/*! ./components/ClientFacing/LandingPage.vue */ "./resources/js/components/ClientFacing/LandingPage.vue").default);
 Vue.component('product-details', __webpack_require__(/*! ./components/ClientFacing/ProductDetails.vue */ "./resources/js/components/ClientFacing/ProductDetails.vue").default);
+Vue.component('menu-bar-component', __webpack_require__(/*! ./components/Shared/MenuBarComponent.vue */ "./resources/js/components/Shared/MenuBarComponent.vue").default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -6949,7 +7003,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.v-card--reveal {\nalign-items: center;\nbottom: 0;\njustify-content: center;\nopacity: .5;\nposition: absolute;\nwidth: 100%;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.v-card--reveal {\n    align-items: center;\n    bottom: 0;\n    justify-content: center;\n    opacity: .5;\n    position: absolute;\n    width: 100%;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -38093,6 +38147,45 @@ component.options.__file = "resources/js/components/ExampleComponent.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/Shared/MenuBarComponent.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/components/Shared/MenuBarComponent.vue ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _MenuBarComponent_vue_vue_type_template_id_527de798___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MenuBarComponent.vue?vue&type=template&id=527de798& */ "./resources/js/components/Shared/MenuBarComponent.vue?vue&type=template&id=527de798&");
+/* harmony import */ var _MenuBarComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MenuBarComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/Shared/MenuBarComponent.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__.default)(
+  _MenuBarComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _MenuBarComponent_vue_vue_type_template_id_527de798___WEBPACK_IMPORTED_MODULE_0__.render,
+  _MenuBarComponent_vue_vue_type_template_id_527de798___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Shared/MenuBarComponent.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/ClientFacing/LandingPage.vue?vue&type=script&lang=js&":
 /*!***************************************************************************************!*\
   !*** ./resources/js/components/ClientFacing/LandingPage.vue?vue&type=script&lang=js& ***!
@@ -38138,6 +38231,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ExampleComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ExampleComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ExampleComponent.vue?vue&type=script&lang=js&");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ExampleComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Shared/MenuBarComponent.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/Shared/MenuBarComponent.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuBarComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./MenuBarComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Shared/MenuBarComponent.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuBarComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
 
 /***/ }),
 
@@ -38192,6 +38301,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/Shared/MenuBarComponent.vue?vue&type=template&id=527de798&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/components/Shared/MenuBarComponent.vue?vue&type=template&id=527de798& ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuBarComponent_vue_vue_type_template_id_527de798___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuBarComponent_vue_vue_type_template_id_527de798___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuBarComponent_vue_vue_type_template_id_527de798___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./MenuBarComponent.vue?vue&type=template&id=527de798& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Shared/MenuBarComponent.vue?vue&type=template&id=527de798&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css&":
 /*!**************************************************************************************************!*\
   !*** ./resources/js/components/ClientFacing/ProductDetails.vue?vue&type=style&index=0&lang=css& ***!
@@ -38228,299 +38354,11 @@ var render = function() {
   return _c(
     "v-app",
     [
-      _c(
-        "v-app-bar",
-        { staticClass: "sticky-top" },
-        [
-          _c("v-toolbar-title", [_vm._v("eCommerce Shop")]),
-          _vm._v(" "),
-          _c("v-spacer"),
-          _vm._v(" "),
-          _c(
-            "v-btn-toggle",
-            {
-              attrs: { tile: "", color: "deep accent-3", group: "" },
-              model: {
-                value: _vm.text,
-                callback: function($$v) {
-                  _vm.text = $$v
-                },
-                expression: "text"
-              }
-            },
-            [
-              _c("v-btn", { attrs: { value: "home", href: "#" + _vm.text } }, [
-                _vm._v(" HOME ")
-              ]),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                { attrs: { value: "products", href: "#" + _vm.text } },
-                [_vm._v(" PRODUCTS ")]
-              ),
-              _vm._v(" "),
-              _c("v-btn", { attrs: { value: "about", href: "#" + _vm.text } }, [
-                _vm._v(" ABOUT US ")
-              ]),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                { attrs: { value: "contact", href: "#" + _vm.text } },
-                [_vm._v(" CONTACT ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "v-menu",
-                {
-                  attrs: {
-                    "close-on-content-click": false,
-                    "nudge-width": 200,
-                    "offset-x": ""
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "activator",
-                      fn: function(ref) {
-                        var on = ref.on
-                        var attrs = ref.attrs
-                        return [
-                          _c(
-                            "v-btn",
-                            _vm._g(
-                              _vm._b(
-                                { attrs: { icon: "" } },
-                                "v-btn",
-                                attrs,
-                                false
-                              ),
-                              on
-                            ),
-                            [
-                              _vm.cartNumber > 0
-                                ? _c(
-                                    "v-badge",
-                                    {
-                                      attrs: {
-                                        color: "green",
-                                        content: _vm.cartNumber
-                                      }
-                                    },
-                                    [_c("v-icon", [_vm._v("mdi-cart ")])],
-                                    1
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.cartNumber == 0
-                                ? _c("v-icon", [_vm._v(" mdi-cart ")])
-                                : _vm._e()
-                            ],
-                            1
-                          )
-                        ]
-                      }
-                    }
-                  ]),
-                  model: {
-                    value: _vm.menu,
-                    callback: function($$v) {
-                      _vm.menu = $$v
-                    },
-                    expression: "menu"
-                  }
-                },
-                [
-                  _vm._v(" "),
-                  _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-list",
-                        [
-                          _c(
-                            "v-list-item",
-                            [
-                              _c("v-list-item-avatar", [
-                                _c("img", {
-                                  attrs: {
-                                    src:
-                                      "https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png",
-                                    alt: "John"
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c(
-                                "v-list-item-content",
-                                [
-                                  _c("v-list-item-title", [
-                                    _vm._v("Shopping Cart")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("v-list-item-subtitle", [
-                                    _vm._v("Products")
-                                  ])
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "v-list-item-action",
-                                [
-                                  _c(
-                                    "v-btn",
-                                    {
-                                      attrs: { color: "primary" },
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.goToSite("/checkout")
-                                        }
-                                      }
-                                    },
-                                    [
-                                      _c("v-icon", { attrs: { left: "" } }, [
-                                        _vm._v("mdi-check-outline")
-                                      ]),
-                                      _vm._v(
-                                        " CHECK OUT\n                                "
-                                      )
-                                    ],
-                                    1
-                                  )
-                                ],
-                                1
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c("v-data-table", {
-                        staticClass: "elevation-1",
-                        attrs: {
-                          headers: _vm.headers,
-                          items: _vm.cartObjectJSON,
-                          "hide-default-footer": ""
-                        },
-                        scopedSlots: _vm._u(
-                          [
-                            {
-                              key: "item.picture",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _c("v-list-item-avatar", [
-                                    _c("img", {
-                                      attrs: {
-                                        src:
-                                          "data:image/png;base64," +
-                                          item.picture,
-                                        alt: item.picture
-                                      }
-                                    })
-                                  ])
-                                ]
-                              }
-                            },
-                            {
-                              key: "item.actions",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _c(
-                                    "v-icon",
-                                    {
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.addCart(item.id)
-                                        }
-                                      }
-                                    },
-                                    [_vm._v(" mdi-plus ")]
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "v-icon",
-                                    {
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.deleteItemCart(item.id)
-                                        }
-                                      }
-                                    },
-                                    [_vm._v(" mdi-delete ")]
-                                  )
-                                ]
-                              }
-                            },
-                            {
-                              key: "item.price",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _vm._v(
-                                    "\n                            $ " +
-                                      _vm._s(item.price) +
-                                      "\n                        "
-                                  )
-                                ]
-                              }
-                            },
-                            {
-                              key: "item.total",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _vm._v(
-                                    "\n                            $ " +
-                                      _vm._s(item.total) +
-                                      "\n                        "
-                                  )
-                                ]
-                              }
-                            },
-                            {
-                              key: "no-data",
-                              fn: function() {
-                                return [
-                                  _vm._v(
-                                    "\n                            You don't have products added\n                        "
-                                  )
-                                ]
-                              },
-                              proxy: true
-                            }
-                          ],
-                          null,
-                          true
-                        )
-                      })
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  attrs: { value: "login" },
-                  on: {
-                    click: function($event) {
-                      return _vm.goToSite("/login")
-                    }
-                  }
-                },
-                [_vm._v(" LOG IN ")]
-              )
-            ],
-            1
-          )
-        ],
-        1
-      ),
+      _c("menu-bar-component", {
+        ref: "childRef1",
+        attrs: { data: _vm.moduleData },
+        on: { onChange: _vm.getCartContent }
+      }),
       _vm._v(" "),
       _c(
         "v-main",
@@ -38896,283 +38734,11 @@ var render = function() {
   return _c(
     "v-app",
     [
-      _c(
-        "v-app-bar",
-        { staticClass: "sticky-top" },
-        [
-          _c("v-toolbar-title", [_vm._v("eCommerce Shop")]),
-          _vm._v(" "),
-          _c("v-spacer"),
-          _vm._v(" "),
-          _c(
-            "v-btn-toggle",
-            {
-              attrs: { tile: "", color: "deep accent-3", group: "" },
-              model: {
-                value: _vm.text,
-                callback: function($$v) {
-                  _vm.text = $$v
-                },
-                expression: "text"
-              }
-            },
-            [
-              _c("v-btn", { attrs: { value: "home", href: "/" } }, [
-                _vm._v(" HOME ")
-              ]),
-              _vm._v(" "),
-              _c(
-                "v-menu",
-                {
-                  attrs: {
-                    "close-on-content-click": false,
-                    "nudge-width": 200,
-                    "offset-x": ""
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "activator",
-                      fn: function(ref) {
-                        var on = ref.on
-                        var attrs = ref.attrs
-                        return [
-                          _c(
-                            "v-btn",
-                            _vm._g(
-                              _vm._b(
-                                { attrs: { icon: "" } },
-                                "v-btn",
-                                attrs,
-                                false
-                              ),
-                              on
-                            ),
-                            [
-                              _vm.cartNumber > 0
-                                ? _c(
-                                    "v-badge",
-                                    {
-                                      attrs: {
-                                        color: "green",
-                                        content: _vm.cartNumber
-                                      }
-                                    },
-                                    [_c("v-icon", [_vm._v("mdi-cart ")])],
-                                    1
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.cartNumber == 0
-                                ? _c("v-icon", [_vm._v(" mdi-cart ")])
-                                : _vm._e()
-                            ],
-                            1
-                          )
-                        ]
-                      }
-                    }
-                  ]),
-                  model: {
-                    value: _vm.menu,
-                    callback: function($$v) {
-                      _vm.menu = $$v
-                    },
-                    expression: "menu"
-                  }
-                },
-                [
-                  _vm._v(" "),
-                  _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-list",
-                        [
-                          _c(
-                            "v-list-item",
-                            [
-                              _c("v-list-item-avatar", [
-                                _c("img", {
-                                  attrs: {
-                                    src:
-                                      "https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png",
-                                    alt: "John"
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c(
-                                "v-list-item-content",
-                                [
-                                  _c("v-list-item-title", [
-                                    _vm._v("Shopping Cart")
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("v-list-item-subtitle", [
-                                    _vm._v("Products")
-                                  ])
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "v-list-item-action",
-                                [
-                                  _c(
-                                    "v-btn",
-                                    {
-                                      attrs: { color: "primary" },
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.goToSite("/checkout")
-                                        }
-                                      }
-                                    },
-                                    [
-                                      _c("v-icon", { attrs: { left: "" } }, [
-                                        _vm._v("mdi-check-outline")
-                                      ]),
-                                      _vm._v(
-                                        " CHECK OUT\n                                "
-                                      )
-                                    ],
-                                    1
-                                  )
-                                ],
-                                1
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c("v-data-table", {
-                        staticClass: "elevation-1",
-                        attrs: {
-                          headers: _vm.headers,
-                          items: _vm.cartObjectJSON,
-                          "hide-default-footer": ""
-                        },
-                        scopedSlots: _vm._u(
-                          [
-                            {
-                              key: "item.picture",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _c("v-list-item-avatar", [
-                                    _c("img", {
-                                      attrs: {
-                                        src:
-                                          "data:image/png;base64," +
-                                          item.picture,
-                                        alt: item.picture
-                                      }
-                                    })
-                                  ])
-                                ]
-                              }
-                            },
-                            {
-                              key: "item.actions",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _c(
-                                    "v-icon",
-                                    {
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.addCart(item.id)
-                                        }
-                                      }
-                                    },
-                                    [_vm._v(" mdi-plus ")]
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "v-icon",
-                                    {
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.deleteItemCart(item.id)
-                                        }
-                                      }
-                                    },
-                                    [_vm._v(" mdi-delete ")]
-                                  )
-                                ]
-                              }
-                            },
-                            {
-                              key: "item.price",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _vm._v(
-                                    "\n                            $ " +
-                                      _vm._s(item.price) +
-                                      "\n                        "
-                                  )
-                                ]
-                              }
-                            },
-                            {
-                              key: "item.total",
-                              fn: function(ref) {
-                                var item = ref.item
-                                return [
-                                  _vm._v(
-                                    "\n                            $ " +
-                                      _vm._s(item.total) +
-                                      "\n                        "
-                                  )
-                                ]
-                              }
-                            },
-                            {
-                              key: "no-data",
-                              fn: function() {
-                                return [
-                                  _vm._v(
-                                    "\n                            You don't have products added\n                        "
-                                  )
-                                ]
-                              },
-                              proxy: true
-                            }
-                          ],
-                          null,
-                          true
-                        )
-                      })
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  attrs: { value: "login" },
-                  on: {
-                    click: function($event) {
-                      return _vm.goToSite("/login")
-                    }
-                  }
-                },
-                [_vm._v(" LOG IN ")]
-              )
-            ],
-            1
-          )
-        ],
-        1
-      ),
+      _c("menu-bar-component", {
+        ref: "childRef",
+        attrs: { data: _vm.moduleData },
+        on: { onChange: _vm.getCartContent }
+      }),
       _vm._v(" "),
       _c(
         "v-main",
@@ -39335,7 +38901,10 @@ var render = function() {
                               _c(
                                 "v-btn",
                                 {
-                                  attrs: { color: "primary" },
+                                  attrs: {
+                                    color: "primary",
+                                    disabled: _vm.cartNumber == 0
+                                  },
                                   on: {
                                     click: function($event) {
                                       return _vm.goToSite("/checkout")
@@ -39591,6 +39160,333 @@ var staticRenderFns = [
     ])
   }
 ]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Shared/MenuBarComponent.vue?vue&type=template&id=527de798&":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Shared/MenuBarComponent.vue?vue&type=template&id=527de798& ***!
+  \***********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "v-app-bar",
+    { staticClass: "sticky-top" },
+    [
+      _c("v-toolbar-title", [_vm._v("eCommerce Shop")]),
+      _vm._v(" "),
+      _c("v-spacer"),
+      _vm._v(" "),
+      _c(
+        "v-btn-toggle",
+        {
+          attrs: { tile: "", color: "deep accent-3", group: "" },
+          model: {
+            value: _vm.text,
+            callback: function($$v) {
+              _vm.text = $$v
+            },
+            expression: "text"
+          }
+        },
+        [
+          _vm.data == "home"
+            ? _c("v-btn", { attrs: { value: "home", href: "#" + _vm.text } }, [
+                _vm._v(" HOME ")
+              ])
+            : _c("v-btn", { attrs: { value: "home", href: "/" } }, [
+                _vm._v(" HOME ")
+              ]),
+          _vm._v(" "),
+          _vm.data == "home"
+            ? _c(
+                "v-btn",
+                { attrs: { value: "products", href: "#" + _vm.text } },
+                [_vm._v(" PRODUCTS ")]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.data == "home"
+            ? _c("v-btn", { attrs: { value: "about", href: "#" + _vm.text } }, [
+                _vm._v(" ABOUT US ")
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.data == "home"
+            ? _c(
+                "v-btn",
+                { attrs: { value: "contact", href: "#" + _vm.text } },
+                [_vm._v(" CONTACT ")]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "v-menu",
+            {
+              attrs: {
+                "close-on-content-click": false,
+                "nudge-width": 200,
+                "offset-x": ""
+              },
+              scopedSlots: _vm._u([
+                {
+                  key: "activator",
+                  fn: function(ref) {
+                    var on = ref.on
+                    var attrs = ref.attrs
+                    return [
+                      _c(
+                        "v-btn",
+                        _vm._g(
+                          _vm._b(
+                            { attrs: { icon: "" } },
+                            "v-btn",
+                            attrs,
+                            false
+                          ),
+                          on
+                        ),
+                        [
+                          _vm.cartNumber > 0
+                            ? _c(
+                                "v-badge",
+                                {
+                                  attrs: {
+                                    color: "green",
+                                    content: _vm.cartNumber
+                                  }
+                                },
+                                [_c("v-icon", [_vm._v("mdi-cart ")])],
+                                1
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.cartNumber == 0
+                            ? _c("v-icon", [_vm._v(" mdi-cart ")])
+                            : _vm._e()
+                        ],
+                        1
+                      )
+                    ]
+                  }
+                }
+              ]),
+              model: {
+                value: _vm.menu,
+                callback: function($$v) {
+                  _vm.menu = $$v
+                },
+                expression: "menu"
+              }
+            },
+            [
+              _vm._v(" "),
+              _c(
+                "v-card",
+                [
+                  _c(
+                    "v-list",
+                    [
+                      _c(
+                        "v-list-item",
+                        [
+                          _c("v-list-item-avatar", [
+                            _c("img", {
+                              attrs: {
+                                src:
+                                  "https://cdn.pixabay.com/photo/2017/06/07/18/35/design-2381160__340.png",
+                                alt: "John"
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "v-list-item-content",
+                            [
+                              _c("v-list-item-title", [
+                                _vm._v("Shopping Cart")
+                              ]),
+                              _vm._v(" "),
+                              _c("v-list-item-subtitle", [_vm._v("Products")])
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-list-item-action",
+                            [
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: {
+                                    color: "primary",
+                                    disabled: _vm.cartNumber == 0
+                                  },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.goToSite("/checkout")
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("v-icon", { attrs: { left: "" } }, [
+                                    _vm._v("mdi-check")
+                                  ]),
+                                  _vm._v(
+                                    " CHECK OUT\n                            "
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("v-data-table", {
+                    staticClass: "elevation-1",
+                    attrs: {
+                      headers: _vm.headers,
+                      items: _vm.cartObjectJSON,
+                      "hide-default-footer": ""
+                    },
+                    scopedSlots: _vm._u(
+                      [
+                        {
+                          key: "item.picture",
+                          fn: function(ref) {
+                            var item = ref.item
+                            return [
+                              _c("v-list-item-avatar", [
+                                _c("img", {
+                                  attrs: {
+                                    src:
+                                      "data:image/png;base64," + item.picture,
+                                    alt: item.picture
+                                  }
+                                })
+                              ])
+                            ]
+                          }
+                        },
+                        {
+                          key: "item.actions",
+                          fn: function(ref) {
+                            var item = ref.item
+                            return [
+                              _c(
+                                "v-icon",
+                                {
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.addCart(item.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v(" mdi-plus ")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-icon",
+                                {
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteItemCart(item.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v(" mdi-delete ")]
+                              )
+                            ]
+                          }
+                        },
+                        {
+                          key: "item.price",
+                          fn: function(ref) {
+                            var item = ref.item
+                            return [
+                              _vm._v(
+                                "\n                        $ " +
+                                  _vm._s(item.price) +
+                                  "\n                    "
+                              )
+                            ]
+                          }
+                        },
+                        {
+                          key: "item.total",
+                          fn: function(ref) {
+                            var item = ref.item
+                            return [
+                              _vm._v(
+                                "\n                        $ " +
+                                  _vm._s(item.total) +
+                                  "\n                    "
+                              )
+                            ]
+                          }
+                        },
+                        {
+                          key: "no-data",
+                          fn: function() {
+                            return [
+                              _vm._v(
+                                "\n                        You don't have products added\n                    "
+                              )
+                            ]
+                          },
+                          proxy: true
+                        }
+                      ],
+                      null,
+                      true
+                    )
+                  })
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-btn",
+            {
+              attrs: { value: "login" },
+              on: {
+                click: function($event) {
+                  return _vm.goToSite("/login")
+                }
+              }
+            },
+            [_vm._v(" LOG IN ")]
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
