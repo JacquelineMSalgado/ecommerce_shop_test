@@ -30,9 +30,13 @@ Vue.use(VueRouter);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+
 Vue.component('landing-page', require('./components/ClientFacing/LandingPage.vue').default);
 Vue.component('product-details', require('./components/ClientFacing/ProductDetails.vue').default);
+Vue.component('check-out-component', require('./components/ClientFacing/CheckOutComponent.vue').default);
+
 Vue.component('menu-bar-component', require('./components/Shared/MenuBarComponent.vue').default);
+Vue.component('footer-component', require('./components/Shared/FooterBarComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

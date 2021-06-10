@@ -22,7 +22,7 @@ Route::group(['middleware' => ['guest']], function() {
     });
 
     Route::get('/checkout', function() {
-        return 'hh';
+        return view('product/check-out');
     });
 
     Route::get('/product/{id}', [ProductController::class, 'show']);
