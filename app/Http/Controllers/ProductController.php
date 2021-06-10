@@ -13,9 +13,8 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $products = Product::get();
+    public function index() {
+        $products = Product::get()->where('status', 1);
         return $products;
     }
 
@@ -24,8 +23,7 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
@@ -35,8 +33,7 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         //
     }
 
@@ -46,9 +43,20 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function show($id) {
+        $product = Product::where('slug', $id)->get('id')->first();
+        return view('product.product-detail', ['product' => $product]);
+    }
+
+    /**
+     * Display the specified product.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getProduct($id) {
+        $product = Product::get()->where('id', $id)->first();
+        return $product;
     }
 
     /**
@@ -57,8 +65,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         //
     }
 
@@ -69,8 +76,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         //
     }
 
@@ -80,8 +86,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id){
         //
     }
 
@@ -147,8 +152,7 @@ class ProductController extends Controller
         return $cart;
     }
 
-    public function removeItemToCart(Request $request)
-    {
+    public function removeItemToCart(Request $request) {
         if($request->id) {
             $cart = session()->get('cart');
             if(isset($cart[$request->id])) {

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,18 +22,21 @@ Route::group(['middleware' => ['guest']], function() {
     });
 
     Route::get('/checkout', function() {
-        return 'Check out';
+        return 'hh';
     });
 
+    Route::get('/product/{id}', [ProductController::class, 'show']);
+    Route::get('/api/product/{id}', [ProductController::class, 'getProduct']);
+
     Route::resource('/api/products', ProductController::class);
-    Route::get('/api/addItemCart/{id}', [App\Http\Controllers\ProductController::class, 'addToCart']);
-    Route::get('/api/productsCart', [App\Http\Controllers\ProductController::class, 'getCart']);
-    Route::get('/api/removeItemCart/{id}', [App\Http\Controllers\ProductController::class, 'removeItemToCart']);
+    Route::get('/api/addItemCart/{id}', [ProductController::class, 'addToCart']);
+    Route::get('/api/productsCart', [ProductController::class, 'getCart']);
+    Route::get('/api/removeItemCart/{id}', [ProductController::class, 'removeItemToCart']);
 });
 
 //MIDDLEWARE GROUP: AUTHENTICATED (USERS AUTHENTICATED)
 Route::group(['middleware' => ['auth']], function() {
-    Route::get('/admin', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/admin', [HomeController::class, 'index'])->name('home');
 });
 
 Auth::routes();

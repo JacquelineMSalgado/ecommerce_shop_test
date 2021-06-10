@@ -31,6 +31,7 @@ Vue.use(VueRouter);
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('landing-page', require('./components/ClientFacing/LandingPage.vue').default);
+Vue.component('product-details', require('./components/ClientFacing/ProductDetails.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
