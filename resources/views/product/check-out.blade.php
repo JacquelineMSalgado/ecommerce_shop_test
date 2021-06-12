@@ -28,7 +28,7 @@
     </head>
     <body class="antialiased">
         <div id="app" class="content"><!--La equita id debe ser app, como hemos visto en app.js-->
-            <landing-page></landing-page><!--Añadimos nuestro componente vuejs-->
+            <check-out-component></check-out-component><!--Añadimos nuestro componente vuejs-->
         </div>
         <script src="{{asset('js/app.js')}}"></script>
     </body>
