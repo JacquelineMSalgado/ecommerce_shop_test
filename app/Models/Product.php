@@ -11,4 +11,8 @@ class Product extends Model
     ['name', 'slug', 'description', 'price', 'picture', 'status'];
 
     use HasFactory;
+
+    public function orders() {
+        return $this->belongsToMany(orders::class, 'products_orders', 'id' /* products */, 'id' /* orders */);
+    }
 }

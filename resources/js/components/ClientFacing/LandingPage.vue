@@ -5,7 +5,7 @@
         <!-- Sizes your content based upon application components -->
         <v-main id="home">
             <v-carousel hide-delimiters cycle>
-                <v-carousel-item v-for="(item,i) in products" :key="i" :src="'data:image/png;base64,' + item.picture"></v-carousel-item>
+                <v-carousel-item v-for="(item,i) in products" :key="i" :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture"></v-carousel-item>
             </v-carousel>
             <!-- Provides the application the proper gutter -->
             <v-container fluid id="products">
@@ -20,7 +20,7 @@
                                         <v-progress-linear color="primary" height="10" indeterminate></v-progress-linear>
                                     </template>
 
-                                    <v-img height="250" :src="'data:image/png;base64,' + item.picture">
+                                    <v-img height="250" :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture">
                                         <v-expand-transition>
                                             <div v-if="hover" class="d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text" style="height: 30%;">
                                                 <v-card-actions class="justify-center">

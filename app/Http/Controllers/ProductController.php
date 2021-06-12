@@ -124,7 +124,7 @@ class ProductController extends Controller
         // if cart not empty then check if this product exist then increment quantity
         if(isset($cart[$id])) {
             $cart[$id]['quantity']++;
-            $cart[$id]['total']=$cart[$id]['price']*$cart[$id]['quantity'];
+            $cart[$id]['total']=round($cart[$id]['price']*$cart[$id]['quantity'], 2);
             session()->put('cart', $cart);
             return redirect()->back()->with('success', 'Product added to cart successfully!');
         }
@@ -148,7 +148,7 @@ class ProductController extends Controller
     }
 
     public function getCart() {
-        $cart = session('cart');
+        $cart = session()->get('cart');
         return $cart;
     }
 
@@ -158,7 +158,7 @@ class ProductController extends Controller
         foreach($cart as $item){
             $total += $item['total'];
         }
-        return $total;
+        return round($total, 2);
     }
 
     public function removeItemToCart(Request $request) {
@@ -169,6 +169,14 @@ class ProductController extends Controller
                 session()->put('cart', $cart);
             }
             session()->flash('success', 'Product removed successfully');
+        }
+    }
+
+    public function removeCart() {
+        $cart = session()->get('cart');
+        foreach($cart as $item){
+            unset($cart[$item['id']]);
+            session()->put('cart', $cart);
         }
     }
 }

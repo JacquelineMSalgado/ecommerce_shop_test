@@ -33,7 +33,7 @@
                 <v-data-table :headers="headers" :items="cartObjectJSON" hide-default-footer class="elevation-1 hidden-sm-and-down">
                     <template v-slot:[`item.picture`]="{ item }">
                         <v-list-item-avatar>
-                            <img :src="'data:image/png;base64,' + item.picture" :alt="item.picture">
+                            <v-img :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture" :alt="item.picture"></v-img>
                         </v-list-item-avatar>
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">

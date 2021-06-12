@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,10 @@ Route::group(['middleware' => ['guest']], function() {
     Route::get('/api/addItemCart/{id}', [ProductController::class, 'addToCart']);
     Route::get('/api/removeItemCart/{id}', [ProductController::class, 'removeItemToCart']);
     Route::get('/api/totalCart', [ProductController::class, 'totalCart']);
+    Route::get('/api/removeCart', [ProductController::class, 'removeCart']);
+
+    // Route::resource('/api/order', OrderController::class);
+    Route::post('/api/order/store', [OrderController::class, 'store']);
 });
 
 //MIDDLEWARE GROUP: AUTHENTICATED (USERS AUTHENTICATED)

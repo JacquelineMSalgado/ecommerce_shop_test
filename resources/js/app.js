@@ -11,8 +11,10 @@ import Vuetify from 'vuetify';
 import Vuex from 'vuex';
 // Include VueRouter
 import VueRouter from 'vue-router';
+import swal from 'sweetalert2';
 
 window.Vue = require('vue').default;
+window.Swal = swal;
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
