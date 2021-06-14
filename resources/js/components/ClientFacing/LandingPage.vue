@@ -5,7 +5,7 @@
         <!-- Sizes your content based upon application components -->
         <v-main id="home">
             <v-carousel hide-delimiters cycle>
-                <v-carousel-item v-for="(item,i) in products" :key="i" :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture"></v-carousel-item>
+                <v-carousel-item v-for="(item,i) in products" :key="i" :src="item.picture" :alt="item.name"></v-carousel-item>
             </v-carousel>
             <!-- Provides the application the proper gutter -->
             <v-container fluid id="products">
@@ -20,11 +20,11 @@
                                         <v-progress-linear color="primary" height="10" indeterminate></v-progress-linear>
                                     </template>
 
-                                    <v-img height="250" :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture">
+                                    <v-img height="250" :src="item.picture" :alt="item.name">
                                         <v-expand-transition>
                                             <div v-if="hover" class="d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text" style="height: 30%;">
                                                 <v-card-actions class="justify-center">
-                                                    <v-btn color="deep lighten-2" :href="'/product/' + item.slug"> READ MORE </v-btn>
+                                                    <v-btn color="deep lighten-2" :href="'/api/productSlug/' + item.slug"> READ MORE </v-btn>
                                                     <v-btn depressed color="success" elevation="2" @click="addCart(item.id)">       
                                                         <v-icon left> mdi-cart </v-icon> ADD TO CART 
                                                     </v-btn>

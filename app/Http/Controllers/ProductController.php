@@ -14,7 +14,7 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $products = Product::get()->where('status', 1);
+        $products = Product::get();
         return $products;
     }
 
@@ -34,7 +34,24 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
-        //
+        if (!$request->ajax()) return redirect('/');
+        
+        try{
+            DB::beginTransaction();
+            $product = new Product();
+            $product->name = $request->name;
+            $product->slug = $request->slug;
+            $product->description = $request->description;
+            $product->price = $request->price;
+            $product->picture = $request->picture;
+            $product->status = 1;
+            $product->save();
+
+            DB::commit();
+
+        } catch (Exception $e){
+            DB::rollBack();
+        }
     }
 
     /**
@@ -77,7 +94,20 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-        //
+        if (!$request->ajax()) return redirect('/');
+        try {
+            DB::beginTransaction();
+                $product = Product::findOrFail($request->id);
+                $product->name = $request['name'];
+                $product->slug = $request['slug'];
+                $product->description = $request['description'];
+                $product->price = $request['price'];
+                $product->picture = $request['picture'];
+                $product->save();
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+        }
     }
 
     /**
@@ -87,7 +117,15 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id){
-        //
+        try {
+            DB::beginTransaction();
+                $product = Product::findOrFail($id);
+                $product->status = 0;
+                $product->save();
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+        }
     }
 
     

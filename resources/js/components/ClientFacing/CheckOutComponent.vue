@@ -12,7 +12,7 @@
                             <v-data-table :headers="headers" :items="cartObjectJSON" hide-default-footer class="elevation-1 mb-5">
                                 <template v-slot:[`item.picture`]="{ item }">
                                     <v-list-item>
-                                        <img :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture" :alt="item.picture" width="80vw">
+                                        <img :src="item.picture" :alt="item.picture" width="80vw">
                                     </v-list-item>
                                 </template>
                                 <template v-slot:[`item.actions`]="{ item }">
@@ -172,18 +172,18 @@
                 quantity: 0,
                 shipping: 0,
                 total: 0.0,
-                first_name: 'd',
-                last_name: 'd',
-                email: 'd@uu.com',
-                phone: '5',
-                address: 'j',
-                zip_code: '5',
-                state: 'jsj',
-                city: 'jd',
-                card_number: '5',
-                cvv: '5',
-                exp_month: '05',
-                exp_year: '2021',
+                first_name: '',
+                last_name: '',
+                email: '',
+                phone: '',
+                address: '',
+                zip_code: '',
+                state: '',
+                city: '',
+                card_number: '',
+                cvv: '',
+                exp_month: '',
+                exp_year: '',
                 products: []
             },
             moduleData: 'checkout',
@@ -258,7 +258,6 @@
                         confirmButtonColor: 'orange',
                         allowOutsideClick: false
                     }).then((result) => {
-                        /* Read more about isConfirmed, isDenied below */
                         if (result.isConfirmed) {
                             axios.post('/api/order/store', this.order).then(function (response) {
                                 console.log(response);
@@ -336,7 +335,7 @@
                 evt = (evt) ? evt : window.event;
                 var charCode = (evt.which) ? evt.which : evt.keyCode;
                 if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                    evt.preventDefault();;
+                    evt.preventDefault();
                 } else {
                     return true;
                 }

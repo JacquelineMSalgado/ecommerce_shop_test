@@ -10,7 +10,7 @@
                         <v-card class="pa-2" tile>
                             <v-hover v-slot="{ hover }">
                                 <v-card class="mx-auto" color="grey lighten-4" max-width="600">
-                                    <v-img :aspect-ratio="16/9" :src="(product.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + product.picture">
+                                    <v-img :aspect-ratio="16/9" :src="product.picture" :alt="product.name">
                                         <v-expand-transition>
                                             <div v-if="hover" class="d-flex transition-fast-in-fast-out  darken-2 v-card--reveal text-h2 white--text" style="height: 30%;">
                                                 <v-btn depressed color="success" elevation="2" @click="addCart(product.id)">       
