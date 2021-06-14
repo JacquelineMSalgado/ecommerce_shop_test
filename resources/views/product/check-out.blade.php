@@ -27,9 +27,11 @@
         <link href="{{asset('css/app.css')}}" rel="stylesheet">
     </head>
     <body class="antialiased">
-        <div id="app" class="content"><!--La equita id debe ser app, como hemos visto en app.js-->
-            <check-out-component></check-out-component><!--Añadimos nuestro componente vuejs-->
+        <!-- Show the check out page -->
+        <div id="app" class="content">
+            <check-out-component></check-out-component>
         </div>
+
         <script src="{{asset('js/app.js')}}"></script>
     </body>
 </html>

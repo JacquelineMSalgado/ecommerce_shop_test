@@ -1,10 +1,11 @@
 <template>
     <v-app>
+        <!-- Menu component -->
         <menu-bar-component @onChange="getCartContent" ref="childRef" :data="moduleData"></menu-bar-component>
-        <v-main id="home">
-            <v-container fluid id="products">
-                <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+        <v-main>
+            <v-container fluid>
                 <v-row>
+                    <!-- Show cart content -->
                     <v-col cols="12" md="8">
                         <v-card class="pa-2" tile>
                             <v-card-text class="text-center black--text font-weight-black"> ITEMS IN YOUR CART </v-card-text>
@@ -32,6 +33,7 @@
                             <v-btn block color="orange white--text" :disabled="enablePayment" href="/"> CONTINUE SHOPPING </v-btn>
                         </v-card>
                     </v-col>
+                    <!-- Show order summary (quantity, shipping and total) -->
                     <v-col cols="12" md="4">
                         <v-card class="pa-2" tile>
                             <v-card-text class="text-center black--text font-weight-black"> ORDER SUMMARY </v-card-text>
@@ -67,6 +69,7 @@
                         </v-card>
                     </v-col>
                 </v-row>
+                <!-- Form for a store a order with the user and payment information -->
                 <v-form ref="form" v-model="valid" lazy-validation>
                     <v-row v-if="enablePayment">
                         <v-col cols="12" md="6">
@@ -136,14 +139,17 @@
 </template>
 
 <script>
+    // Call all the states and cities of estados-municipios file
     import datos from "../../../json/estados-municipios.json";
 
     export default {
+        // Call method for load cart content and states after DOM has been mounted
         mounted() {
             console.log('Component check out mounted.');
             this.getCartContent();
             this.states = Object.keys(datos);
         },
+        // Computed properties to years and months, are used for the credit card. 
         computed: {
             years() {
                 const year = new Date().getFullYear();
@@ -167,6 +173,7 @@
                 return months;
             }
         },
+        // The data content variable to order object, cart content, table headers, form rules and row
         data: () => ({
             order: {
                 quantity: 0,
@@ -238,6 +245,7 @@
             enablePayment: false,
         }),
         methods: {
+            // Method for validate form and store the order information
             validate () {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -281,6 +289,7 @@
                     });
                 }
             },
+            // Method for add a item for the user cart
             addCart($id) {
                 this.loading = $id;
                 axios.get('/api/addItemCart/' + $id).then(res=>{
@@ -292,6 +301,7 @@
                 });
                 this.getCartContent();
             },
+            // Method for remove a item for the user cart
             deleteItemCart($id) {
                 this.loading = $id;
                 axios.get('/api/removeItemCart/' + $id).then(res=>{
@@ -303,6 +313,7 @@
                 });
                 this.getCartContent();
             },
+            // Method for consult user cart
             getCartContent() {
                 axios.get('/api/productsCart').then(res=>{
                     this.cartObject = res.data;
@@ -317,20 +328,25 @@
                 });
                 this.callChild();
             },
+            // Method for comunicate with menu component
             callChild() {
                 this.$refs.childRef.getCartContent();
             },
+            // Method for visual transform a phone number
             acceptNumber() {
                 var x = this.order.phone.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
                 this.order.phone = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
             },
+            // Method for visual transform a number credit card
             numberCardMask() {
                 var x = this.order.card_number.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})(\d{0,4})(\d{0,4})/);
                 this.order.card_number = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
             },
+            // Method to obtein cities of a specify state
             getCities() {
                 this.cities = datos[this.order.state];
             },
+            // Method verify that only numbers and dot are entered
             isNumber: function(evt) {
                 evt = (evt) ? evt : window.event;
                 var charCode = (evt.which) ? evt.which : evt.keyCode;

@@ -27,9 +27,11 @@
         <link href="{{asset('css/app.css')}}" rel="stylesheet">
     </head>
     <body class="antialiased">
-        <div id="app" class="content"><!--La equita id debe ser app, como hemos visto en app.js-->
-            <landing-page></landing-page><!--Añadimos nuestro componente vuejs-->
+        <!-- Show the landing page -->
+        <div id="app" class="content">
+            <landing-page></landing-page>
         </div>
+        
         <script src="{{asset('js/app.js')}}"></script>
     </body>
 </html>

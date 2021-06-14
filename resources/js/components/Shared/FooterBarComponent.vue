@@ -1,4 +1,6 @@
 <template>
+    <!-- Footer
+    Display footer of application. -->
     <v-footer dark padless id="about">
         <v-card flat tile class="lighten-1 white--text text-center">
             <v-card-text>
@@ -22,9 +24,11 @@
 
 <script>
     export default {
+        // Call method for indicate the actual component after DOM has been mounted
         mounted() {
             console.log('Component footer mounted.');
         },
+        // The data content variable to icons of social media
         data: () => ({
             icons: [
                 'mdi-facebook',

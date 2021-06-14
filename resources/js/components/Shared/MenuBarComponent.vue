@@ -1,10 +1,11 @@
 <template>
     <v-app-bar class="sticky-top">
-        <v-toolbar-title>eCommerce Shop</v-toolbar-title>
+        <v-toolbar-title>e-commerce shop</v-toolbar-title>
 
         <v-spacer></v-spacer>
 
-        <!-- Buttom for open cart. The card contain -->
+        <!-- Buttom for open cart. 
+        The card contain all the product added to cart with the next infomation: picture, quantity, unit price and total. -->
         <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
@@ -54,6 +55,8 @@
             </v-card>
         </v-menu>
 
+        <!-- Menu
+        Display all the options in the toolbar, the design is responsive. -->
         <v-toolbar-items class="hidden-sm-and-down">
             <v-btn text v-for="item in menuItems" :key="item.title" :href="item.path"> {{item.title}} </v-btn>
         </v-toolbar-items>
@@ -75,9 +78,11 @@
 <script>
     export default {
         props: ["data"],
+        // Call method for load cart content after DOM has been mounted
         mounted() {
             this.getCartContent();
         },
+        // The data content variables to cart and menu options
         data: () => ({
             cartNumber: 0,
             cartObject: [],
@@ -125,6 +130,7 @@
             ]
         }),
         methods: {
+            // Method for add a item for the user cart
             addCart($id) {
                 this.loading = $id;
                 axios.get('/api/addItemCart/' + $id).then(res=>{
@@ -137,6 +143,7 @@
                 this.getCartContent();
                 this.callParent();
             },
+            // Method for remove a item for the user cart
             deleteItemCart($id) {
                 this.loading = $id;
                 axios.get('/api/removeItemCart/' + $id).then(res=>{
@@ -149,6 +156,7 @@
                 this.getCartContent();
                 this.callParent();
             },
+            // Method for consult user cart
             getCartContent() {
                 axios.get('/api/productsCart').then(res=>{
                     this.cartObject = res.data;
@@ -156,6 +164,7 @@
                     this.cartObjectJSON = Object.values(this.cartObject);
                 });
             },
+            // Method for comunicate with a other components
             callParent() {
                 this.$emit('onChange');
             }

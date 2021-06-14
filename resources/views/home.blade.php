@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+    <!-- Show the admin, user or product page depend of actual route -->
     @if (Route::currentRouteName() == 'home')
     <div class="container">
         <div class="row justify-content-center">

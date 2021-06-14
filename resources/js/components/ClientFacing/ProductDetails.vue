@@ -1,10 +1,11 @@
 <template>
     <v-app>
+        <!-- Menu component -->
         <menu-bar-component @onChange="getCartContent" ref="childRef" :data="moduleData"></menu-bar-component>
 
-        <!-- Sizes your content based upon application components -->
         <v-main id="home">
-            <v-container fluid id="products">
+            <!-- Show detail of product -->
+            <v-container fluid>
                 <v-row class="mt-5">
                     <v-col cols="12" md="4">
                         <v-card class="pa-2" tile>
@@ -54,8 +55,10 @@
             </v-container>
         </v-main>
 
+        <!-- Footer component -->
         <footer-component></footer-component>
 
+        <!-- Element for a user messages -->
         <v-snackbar v-model="snackbar" :timeout="timeout"> {{ textSnackBar }}
             <template v-slot:action="{ attrs }">
                 <v-btn color="blue" text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
@@ -66,11 +69,14 @@
 
 <script>
     export default {
+        // Receive id product
         props: ["product_id"],
+        // Call method for load cart content after DOM has been mounted
         mounted() {
             console.log('Component product details mounted.');
             this.getCartContent();
         },
+        // The data content variable to product, cart content, table headers
         data: () => ({
             moduleData: 'product',
             product: [],
@@ -123,6 +129,7 @@
                 },
             ],
         }),
+        // Method for consult one product
         created(){
             axios.get('/api/product/' + this.product_id).then(res=>{
                 this.product = res.data;
@@ -130,6 +137,7 @@
             });
         },
         methods: {
+            // Method for add a item for the user cart
             addCart($id) {
                 this.loading = $id;
                 axios.get('/api/addItemCart/' + $id).then(res=>{
@@ -141,6 +149,7 @@
                 });
                 this.getCartContent();
             },
+            // Method for remove a item for the user cart
             deleteItemCart($id) {
                 this.loading = $id;
                 axios.get('/api/removeItemCart/' + $id).then(res=>{
@@ -152,6 +161,7 @@
                 });
                 this.getCartContent();
             },
+            // Method for consult user cart
             getCartContent() {
                 axios.get('/api/productsCart').then(res=>{
                     this.cartObject = res.data;
@@ -160,6 +170,7 @@
                 });
                 this.callChild();
             },
+            // Method for comunicate with menu component
             callChild() {
                 this.$refs.childRef.getCartContent();
             }
