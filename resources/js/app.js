@@ -11,6 +11,7 @@ import Vuetify from 'vuetify';
 import Vuex from 'vuex';
 // Include VueRouter
 import VueRouter from 'vue-router';
+// Include Sweetalert
 import swal from 'sweetalert2';
 
 window.Vue = require('vue').default;
@@ -33,13 +34,16 @@ Vue.use(VueRouter);
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
+// Client facing components
 Vue.component('landing-page', require('./components/ClientFacing/LandingPage.vue').default);
 Vue.component('product-details', require('./components/ClientFacing/ProductDetails.vue').default);
 Vue.component('check-out-component', require('./components/ClientFacing/CheckOutComponent.vue').default);
 
+// Shared components
 Vue.component('menu-bar-component', require('./components/Shared/MenuBarComponent.vue').default);
 Vue.component('footer-component', require('./components/Shared/FooterBarComponent.vue').default);
 
+// Admin facing components
 Vue.component('user-component', require('./components/AdminFacing/UserComponent.vue').default);
 Vue.component('product-component', require('./components/AdminFacing/ProductComponent.vue').default);
 

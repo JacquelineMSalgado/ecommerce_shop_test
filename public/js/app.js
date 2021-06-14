@@ -1908,13 +1908,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Call method for indicate the actual component after DOM has been mounted
   mounted: function mounted() {
     console.log('Component product mounted.');
   },
+  // Call consult products method
   created: function created() {
     this.loadData();
   },
+  // The data content variable to products, table headers, form rules and row
   data: function data() {
     return {
       products: [],
@@ -1975,6 +1980,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    // Method for consult all products
     loadData: function loadData() {
       var _this = this;
 
@@ -1983,12 +1989,14 @@ __webpack_require__.r(__webpack_exports__);
         console.log(_this.products);
       });
     },
+    // Method for open dialog with the form
     openDialog: function openDialog(object) {
       this.dialog = true;
       console.log(object);
       this.rowSelected = object;
       this.previewImage = this.rowSelected.picture;
     },
+    // Method for store or update a product. Check if the record is new o exit and redirect the indicated route
     saveItem: function saveItem() {
       var _this2 = this;
 
@@ -2039,6 +2047,7 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    // Method for logical delete a product
     deleteItem: function deleteItem(id) {
       var _this3 = this;
 
@@ -2082,6 +2091,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
+    // Method verify that only numbers and dot are entered
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -2092,6 +2102,7 @@ __webpack_require__.r(__webpack_exports__);
         return true;
       }
     },
+    // Method for upload a image
     getImage: function getImage(e) {
       var _this4 = this;
 
@@ -2170,13 +2181,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Call method for indicate the actual component after DOM has been mounted
   mounted: function mounted() {
     console.log('Component user mounted.');
   },
+  // Call consult products method
   created: function created() {
     this.loadData();
   },
+  // The data content variable to users, table headers, form rules and row
   data: function data() {
     return {
       users: [],
@@ -2224,6 +2240,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    // Method for consult all users
     loadData: function loadData() {
       var _this = this;
 
@@ -2232,11 +2249,13 @@ __webpack_require__.r(__webpack_exports__);
         console.log(_this.users);
       });
     },
+    // Method for open dialog with the form
     openDialog: function openDialog(object) {
       this.dialog = true;
       console.log(object);
       this.rowSelected = object;
     },
+    // Method for store or update a user. Check if the record is new o exit and redirect the indicated route
     saveItem: function saveItem() {
       var _this2 = this;
 
@@ -2286,6 +2305,7 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    // Method for delete a user
     deleteItem: function deleteItem(id) {
       var _this3 = this;
 
@@ -2470,13 +2490,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+// Call all the states and cities of estados-municipios file
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Call method for load cart content and states after DOM has been mounted
   mounted: function mounted() {
     console.log('Component check out mounted.');
     this.getCartContent();
     this.states = Object.keys(_json_estados_municipios_json__WEBPACK_IMPORTED_MODULE_0__);
   },
+  // Computed properties to years and months, are used for the credit card. 
   computed: {
     years: function years() {
       var year = new Date().getFullYear();
@@ -2527,6 +2553,7 @@ __webpack_require__.r(__webpack_exports__);
       return months;
     }
   },
+  // The data content variable to order object, cart content, table headers, form rules and row
   data: function data() {
     return {
       order: {
@@ -2596,6 +2623,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    // Method for validate form and store the order information
     validate: function validate() {
       var _this = this;
 
@@ -2642,6 +2670,7 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    // Method for add a item for the user cart
     addCart: function addCart($id) {
       var _this2 = this;
 
@@ -2655,6 +2684,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
+    // Method for remove a item for the user cart
     deleteItemCart: function deleteItemCart($id) {
       var _this3 = this;
 
@@ -2668,6 +2698,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
+    // Method for consult user cart
     getCartContent: function getCartContent() {
       var _this4 = this;
 
@@ -2684,20 +2715,25 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.callChild();
     },
+    // Method for comunicate with menu component
     callChild: function callChild() {
       this.$refs.childRef.getCartContent();
     },
+    // Method for visual transform a phone number
     acceptNumber: function acceptNumber() {
       var x = this.order.phone.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
       this.order.phone = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
     },
+    // Method for visual transform a number credit card
     numberCardMask: function numberCardMask() {
       var x = this.order.card_number.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})(\d{0,4})(\d{0,4})/);
       this.order.card_number = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
     },
+    // Method to obtein cities of a specify state
     getCities: function getCities() {
       this.cities = _json_estados_municipios_json__WEBPACK_IMPORTED_MODULE_0__[this.order.state];
     },
+    // Method verify that only numbers and dot are entered
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -2791,11 +2827,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Call method for load cart content after DOM has been mounted
   mounted: function mounted() {
     console.log('Component landing mounted.');
     this.getCartContent();
   },
+  // The data content variable to products, cart content
   data: function data() {
     return {
       moduleData: 'home',
@@ -2812,11 +2852,13 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     var _this = this;
 
+    // Method for consult all products
     axios.get('/api/products').then(function (res) {
       _this.products = res.data;
     });
   },
   methods: {
+    // Method for add a item for the user cart
     addCart: function addCart($id) {
       var _this2 = this;
 
@@ -2830,6 +2872,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
+    // Method for remove a item for the user cart
     deleteItemCart: function deleteItemCart($id) {
       var _this3 = this;
 
@@ -2843,6 +2886,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
+    // Method for consult user cart
     getCartContent: function getCartContent() {
       var _this4 = this;
 
@@ -2853,6 +2897,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.callChild();
     },
+    // Method for comunicate with menu component
     callChild: function callChild() {
       this.$refs.childRef1.getCartContent();
     }
@@ -2938,12 +2983,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Receive id product
   props: ["product_id"],
+  // Call method for load cart content after DOM has been mounted
   mounted: function mounted() {
     console.log('Component product details mounted.');
     this.getCartContent();
   },
+  // The data content variable to product, cart content, table headers
   data: function data() {
     return {
       moduleData: 'product',
@@ -2986,6 +3037,7 @@ __webpack_require__.r(__webpack_exports__);
       }]
     };
   },
+  // Method for consult one product
   created: function created() {
     var _this = this;
 
@@ -2995,6 +3047,7 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
+    // Method for add a item for the user cart
     addCart: function addCart($id) {
       var _this2 = this;
 
@@ -3008,6 +3061,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
+    // Method for remove a item for the user cart
     deleteItemCart: function deleteItemCart($id) {
       var _this3 = this;
 
@@ -3021,6 +3075,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.getCartContent();
     },
+    // Method for consult user cart
     getCartContent: function getCartContent() {
       var _this4 = this;
 
@@ -3031,6 +3086,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.callChild();
     },
+    // Method for comunicate with menu component
     callChild: function callChild() {
       this.$refs.childRef.getCartContent();
     }
@@ -3107,10 +3163,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Call method for indicate the actual component after DOM has been mounted
   mounted: function mounted() {
     console.log('Component footer mounted.');
   },
+  // The data content variable to icons of social media
   data: function data() {
     return {
       icons: ['mdi-facebook', 'mdi-twitter', 'mdi-linkedin', 'mdi-instagram']
@@ -3205,11 +3265,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ["data"],
+  // Call method for load cart content after DOM has been mounted
   mounted: function mounted() {
     this.getCartContent();
   },
+  // The data content variables to cart and menu options
   data: function data() {
     return {
       cartNumber: 0,
@@ -3263,6 +3328,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    // Method for add a item for the user cart
     addCart: function addCart($id) {
       var _this = this;
 
@@ -3277,6 +3343,7 @@ __webpack_require__.r(__webpack_exports__);
       this.getCartContent();
       this.callParent();
     },
+    // Method for remove a item for the user cart
     deleteItemCart: function deleteItemCart($id) {
       var _this2 = this;
 
@@ -3291,6 +3358,7 @@ __webpack_require__.r(__webpack_exports__);
       this.getCartContent();
       this.callParent();
     },
+    // Method for consult user cart
     getCartContent: function getCartContent() {
       var _this3 = this;
 
@@ -3300,6 +3368,7 @@ __webpack_require__.r(__webpack_exports__);
         _this3.cartObjectJSON = Object.values(_this3.cartObject);
       });
     },
+    // Method for comunicate with a other components
     callParent: function callParent() {
       this.$emit('onChange');
     }
@@ -3334,6 +3403,7 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); // Includ
 
  // Include VueRouter
 
+ // Include Sweetalert
 
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js").default;
@@ -3351,12 +3421,15 @@ Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_3__.default);
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue").default);
+Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue").default); // Client facing components
+
 Vue.component('landing-page', __webpack_require__(/*! ./components/ClientFacing/LandingPage.vue */ "./resources/js/components/ClientFacing/LandingPage.vue").default);
 Vue.component('product-details', __webpack_require__(/*! ./components/ClientFacing/ProductDetails.vue */ "./resources/js/components/ClientFacing/ProductDetails.vue").default);
-Vue.component('check-out-component', __webpack_require__(/*! ./components/ClientFacing/CheckOutComponent.vue */ "./resources/js/components/ClientFacing/CheckOutComponent.vue").default);
+Vue.component('check-out-component', __webpack_require__(/*! ./components/ClientFacing/CheckOutComponent.vue */ "./resources/js/components/ClientFacing/CheckOutComponent.vue").default); // Shared components
+
 Vue.component('menu-bar-component', __webpack_require__(/*! ./components/Shared/MenuBarComponent.vue */ "./resources/js/components/Shared/MenuBarComponent.vue").default);
-Vue.component('footer-component', __webpack_require__(/*! ./components/Shared/FooterBarComponent.vue */ "./resources/js/components/Shared/FooterBarComponent.vue").default);
+Vue.component('footer-component', __webpack_require__(/*! ./components/Shared/FooterBarComponent.vue */ "./resources/js/components/Shared/FooterBarComponent.vue").default); // Admin facing components
+
 Vue.component('user-component', __webpack_require__(/*! ./components/AdminFacing/UserComponent.vue */ "./resources/js/components/AdminFacing/UserComponent.vue").default);
 Vue.component('product-component', __webpack_require__(/*! ./components/AdminFacing/ProductComponent.vue */ "./resources/js/components/AdminFacing/ProductComponent.vue").default);
 /**
@@ -43526,11 +43599,10 @@ var render = function() {
       _vm._v(" "),
       _c(
         "v-main",
-        { attrs: { id: "home" } },
         [
           _c(
             "v-container",
-            { attrs: { fluid: "", id: "products" } },
+            { attrs: { fluid: "" } },
             [
               _c(
                 "v-row",
@@ -44844,7 +44916,7 @@ var render = function() {
         [
           _c(
             "v-container",
-            { attrs: { fluid: "", id: "products" } },
+            { attrs: { fluid: "" } },
             [
               _c(
                 "v-row",
@@ -45292,7 +45364,7 @@ var render = function() {
     "v-app-bar",
     { staticClass: "sticky-top" },
     [
-      _c("v-toolbar-title", [_vm._v("eCommerce Shop")]),
+      _c("v-toolbar-title", [_vm._v("e-commerce shop")]),
       _vm._v(" "),
       _c("v-spacer"),
       _vm._v(" "),

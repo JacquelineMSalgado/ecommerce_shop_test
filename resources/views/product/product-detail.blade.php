@@ -27,8 +27,9 @@
         <link href="{{asset('css/app.css')}}" rel="stylesheet">
     </head>
     <body class="antialiased">
-        <div id="app" class="content"><!--La equita id debe ser app, como hemos visto en app.js-->
-            <product-details :product_id="{{json_encode($product->id)}}"></product-details><!--Añadimos nuestro componente vuejs-->
+        <!-- Show the product details page -->
+        <div id="app" class="content">
+            <product-details :product_id="{{json_encode($product->id)}}"></product-details>
         </div>
         <script src="{{asset('js/app.js')}}"></script>
     </body>

@@ -7,6 +7,7 @@
           <v-btn class="btn-block" color="success" @click="openDialog">NEW PRODUCT</v-btn>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
         </v-card-text>
+        <!-- Table with all products records -->
         <v-card-text>
             <v-data-table :headers="headers" :items="products" :search="search" :items-per-page="5" @click:row="openDialog">
               <template v-slot:[`item.picture`]="{ item }">
@@ -21,6 +22,7 @@
             </v-data-table>
         </v-card-text>
     </v-card>
+    <!-- Dialog for create/update product -->
     <v-dialog v-model="dialog" persistent max-width="50%" transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="orange">
@@ -63,12 +65,15 @@
 
 <script>
     export default {
+      // Call method for indicate the actual component after DOM has been mounted
       mounted() {
-          console.log('Component product mounted.');
+        console.log('Component product mounted.');
       },
+      // Call consult products method
       created(){
         this.loadData();
       },
+      // The data content variable to products, table headers, form rules and row
       data: () => ({
         products: [],
         search: '',
@@ -97,18 +102,21 @@
         previewImage:null
       }),
       methods: {
+        // Method for consult all products
         loadData() {
           axios.get('/api/products').then(res=>{
             this.products = res.data;
             console.log(this.products);
           });
         },
+        // Method for open dialog with the form
         openDialog(object) {
           this.dialog = true;
           console.log(object);
           this.rowSelected = object;
           this.previewImage = this.rowSelected.picture;
         },
+        // Method for store or update a product. Check if the record is new o exit and redirect the indicated route
         saveItem() {
           this.rowSelected.picture = this.previewImage;
           const Toast = Swal.mixin({
@@ -155,6 +163,7 @@
             });
           }
         },
+        // Method for logical delete a product
         deleteItem(id) {
           this.dialog = false;
           const Toast = Swal.mixin({
@@ -196,6 +205,7 @@
             }
           });
         },
+        // Method verify that only numbers and dot are entered
         isNumber: function(evt) {
           evt = (evt) ? evt : window.event;
           var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -205,6 +215,7 @@
               return true;
           }
         },
+        // Method for upload a image
         getImage(e){
           const image = e.target.files[0];
           const reader = new FileReader();

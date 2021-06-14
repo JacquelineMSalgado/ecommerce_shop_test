@@ -7,6 +7,7 @@
           <v-btn class="btn-block" color="success" @click="openDialog">NEW USER</v-btn>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
         </v-card-text>
+        <!-- Table with all users records -->
         <v-card-text>
             <v-data-table :headers="headers" :items="users" :search="search" :items-per-page="5" @click:row="openDialog">
               <template v-slot:[`item.actions`]="{ item }">
@@ -15,6 +16,7 @@
             </v-data-table>
         </v-card-text>
     </v-card>
+    <!-- Dialog for create/update user -->
     <v-dialog v-model="dialog" persistent max-width="50%" transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="orange">
@@ -50,12 +52,15 @@
 
 <script>
     export default {
+      // Call method for indicate the actual component after DOM has been mounted
       mounted() {
           console.log('Component user mounted.');
       },
+      // Call consult products method
       created(){
         this.loadData();
       },
+      // The data content variable to users, table headers, form rules and row
       data: () => ({
         users: [],
         search: '',
@@ -80,17 +85,20 @@
         forgot: false,
       }),
       methods: {
+        // Method for consult all users
         loadData() {
           axios.get('/api/users').then(res=>{
               this.users = res.data;
               console.log(this.users);
           });
         },
+        // Method for open dialog with the form
         openDialog(object) {
           this.dialog = true;
           console.log(object);
           this.rowSelected = object;
         },
+        // Method for store or update a user. Check if the record is new o exit and redirect the indicated route
         saveItem() {
           const Toast = Swal.mixin({
             toast: true,
@@ -136,6 +144,7 @@
             });
           }
         },
+        // Method for delete a user
         deleteItem(id) {
           const Toast = Swal.mixin({
             toast: true,
