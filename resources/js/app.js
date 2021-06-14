@@ -40,6 +40,8 @@ Vue.component('check-out-component', require('./components/ClientFacing/CheckOut
 Vue.component('menu-bar-component', require('./components/Shared/MenuBarComponent.vue').default);
 Vue.component('footer-component', require('./components/Shared/FooterBarComponent.vue').default);
 
+Vue.component('user-component', require('./components/AdminFacing/UserComponent.vue').default);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

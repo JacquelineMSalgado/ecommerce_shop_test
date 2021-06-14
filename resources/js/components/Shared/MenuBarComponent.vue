@@ -120,7 +120,7 @@
                 { path: "/", name: "product", title: "HOME" },
                 { path: "/categories", name: "us", title: "CATEGORIES" },
                 { path: "/contact", name: "resources", title: "CONTACT" },
-                { path: "/login", name: "login", title: "LOG IN" }
+                { path: "/login", name: "login", title: "LOGIN" }
             ]
         }),
         methods: {
