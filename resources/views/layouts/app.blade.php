@@ -47,6 +47,19 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <div class="dropdown-header text-center">
+                                        <strong>OPTIONS</strong>
+                                    </div>
+                                    <a class="dropdown-item text-center" href="/admin">
+                                        Dashboard
+                                    </a>
+                                    <a class="dropdown-item text-center" href="/admin/users">
+                                        CRUD User
+                                    </a>
+                                    <a class="dropdown-item text-center" href="/admin/products">
+                                        CRUD Product
+                                    </a>
+
+                                    <div class="dropdown-header text-center">
                                         <strong>PROFILE</strong>
                                     </div>
                                     <a class="dropdown-item text-center" href="{{ route('logout') }}"

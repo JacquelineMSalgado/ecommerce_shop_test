@@ -41,6 +41,7 @@ Vue.component('menu-bar-component', require('./components/Shared/MenuBarComponen
 Vue.component('footer-component', require('./components/Shared/FooterBarComponent.vue').default);
 
 Vue.component('user-component', require('./components/AdminFacing/UserComponent.vue').default);
+Vue.component('product-component', require('./components/AdminFacing/ProductComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

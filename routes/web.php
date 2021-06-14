@@ -27,10 +27,9 @@ Route::group(['middleware' => ['guest']], function() {
         return view('product/check-out');
     });
 
-    Route::get('/product/{id}', [ProductController::class, 'show']);
+    Route::get('/api/productSlug/{id}', [ProductController::class, 'show']);
     Route::get('/api/product/{id}', [ProductController::class, 'getProduct']);
 
-    Route::resource('/api/products', ProductController::class);
     Route::get('/api/productsCart', [ProductController::class, 'getCart']);
     Route::get('/api/addItemCart/{id}', [ProductController::class, 'addToCart']);
     Route::get('/api/removeItemCart/{id}', [ProductController::class, 'removeItemToCart']);
@@ -44,8 +43,11 @@ Route::group(['middleware' => ['guest']], function() {
 //MIDDLEWARE GROUP: AUTHENTICATED (USERS AUTHENTICATED)
 Route::group(['middleware' => ['auth']], function() {
     Route::get('/admin', [HomeController::class, 'index'])->name('home');
+    Route::get('/admin/users', [HomeController::class, 'index'])->name('users');
+    Route::get('/admin/products', [HomeController::class, 'index'])->name('products');
 
     Route::resource('/api/users', UserController::class);
 });
 
 Auth::routes();
+Route::resource('/api/products', ProductController::class);

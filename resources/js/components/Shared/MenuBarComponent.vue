@@ -4,6 +4,7 @@
 
         <v-spacer></v-spacer>
 
+        <!-- Buttom for open cart. The card contain -->
         <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
@@ -33,7 +34,7 @@
                 <v-data-table :headers="headers" :items="cartObjectJSON" hide-default-footer class="elevation-1 hidden-sm-and-down">
                     <template v-slot:[`item.picture`]="{ item }">
                         <v-list-item-avatar>
-                            <v-img :src="(item.picture.includes('.png') ? '/storage/images/' : 'data:image/png;base64,') + item.picture" :alt="item.picture"></v-img>
+                            <v-img :src="item.picture" :alt="item.picture"></v-img>
                         </v-list-item-avatar>
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">

@@ -1,16 +1,22 @@
 <template>
   <v-app style="min-height: 0">
     <v-card elevation="2">
-        <v-card-title> USERS </v-card-title>
+        <v-card-title> PRODUCTS </v-card-title>
         <v-card-subtitle> Create, Read, Update, Delete </v-card-subtitle>
         <v-card-text>
-          <v-btn class="btn-block" color="success" @click="openDialog">NEW USER</v-btn>
+          <v-btn class="btn-block" color="success" @click="openDialog">NEW PRODUCT</v-btn>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
         </v-card-text>
         <v-card-text>
-            <v-data-table :headers="headers" :items="users" :search="search" :items-per-page="5" @click:row="openDialog">
+            <v-data-table :headers="headers" :items="products" :search="search" :items-per-page="5" @click:row="openDialog">
+              <template v-slot:[`item.picture`]="{ item }">
+                <img :src="item.picture" :alt="item.name" width="100vw">
+              </template>
+              <template v-slot:[`item.status`]="{ item }">
+                <v-chip :color="item.status == 1 ? 'success' : 'orange'" dark> {{ item.status == 1 ? 'Activo' : 'Baja' }} </v-chip>
+              </template>
               <template v-slot:[`item.actions`]="{ item }">
-                <v-icon small @click="deleteItem(item.id)"> mdi-delete </v-icon>
+                <v-icon small @click="deleteItem(item.id)" v-if="item.status == 1"> mdi-delete </v-icon>
               </template>
             </v-data-table>
         </v-card-text>
@@ -21,7 +27,7 @@
           <v-btn icon dark @click="dialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>{{rowSelected.id ? 'EDIT USER' : 'CREATE USER'}}</v-toolbar-title>
+          <v-toolbar-title>{{rowSelected.id ? 'EDIT PRODUCT' : 'CREATE PRODUCT'}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
             <v-btn dark text @click="dialog = false"> CANCEL </v-btn>
@@ -35,10 +41,17 @@
                 <v-text-field outlined dense label="Name" v-model="rowSelected.name" :rules="[rules.required]"></v-text-field>
               </v-col>
               <v-col cols="12" md="6" class="py-0">
-                <v-text-field outlined dense label="Email" v-model="rowSelected.email" hint="user@email.com" :rules="[rules.required, rules.email]"></v-text-field>
+                <v-text-field outlined dense label="Slug" v-model="rowSelected.slug" :rules="[rules.required]" @keydown.space.prevent></v-text-field>
               </v-col>
-              <v-col cols="12" md="6" class="py-0">
-                <v-text-field outlined dense label="Password" v-model="rowSelected.password" type="password" :rules="[rules.required, rules.passwordLength, rules.passwordSecurity]"></v-text-field>
+              <v-col cols="12" md="8" class="py-0">
+                <v-textarea outlined dense label="Description" v-model="rowSelected.description" :rules="[rules.required]"></v-textarea>
+              </v-col>
+              <v-col cols="12" md="4" class="py-0">
+                <v-text-field outlined dense label="Price" v-model="rowSelected.price" :rules="[rules.required]" @keypress="isNumber($event)" prefix="$"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="12" class="py-0">
+                <v-img :src="previewImage" class="uploading-image" width="100%" />
+                <input type="file" accept="image/*" @change="getImage">
               </v-col>
             </v-row>
           </v-container>
@@ -51,18 +64,21 @@
 <script>
     export default {
       mounted() {
-          console.log('Component user mounted.');
+          console.log('Component product mounted.');
       },
       created(){
         this.loadData();
       },
       data: () => ({
-        users: [],
+        products: [],
         search: '',
         headers: [
           { text: 'ID', align: 'center', value: 'id', sortable: false },
+          { text: 'PICTURE', align: 'center', value: 'picture' },
           { text: 'NAME', align: 'center', value: 'name' },
-          { text: 'EMAIL', align: 'center', value: 'email' },
+          { text: 'PRICE', align: 'center', value: 'price' },
+          { text: 'SLUG', align: 'center', value: 'slug' },
+          { text: 'STATUS', align: 'center', value: 'status' },
           { text: '', align: 'center', value: 'actions', sortable: false },
         ],
         dialog: false,
@@ -78,20 +94,23 @@
           passwordSecurity: value => /(?=.*\d)/.test(value) || 'Password must contain at least one number', 
         },
         forgot: false,
+        previewImage:null
       }),
       methods: {
         loadData() {
-          axios.get('/api/users').then(res=>{
-              this.users = res.data;
-              console.log(this.users);
+          axios.get('/api/products').then(res=>{
+            this.products = res.data;
+            console.log(this.products);
           });
         },
         openDialog(object) {
           this.dialog = true;
           console.log(object);
           this.rowSelected = object;
+          this.previewImage = this.rowSelected.picture;
         },
         saveItem() {
+          this.rowSelected.picture = this.previewImage;
           const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -105,7 +124,7 @@
           })
 
           if(this.rowSelected.id) {
-            axios.put('/api/users/' + this.rowSelected.id, this.rowSelected).then(res=>{
+            axios.put('/api/products/' + this.rowSelected.id, this.rowSelected).then(res=>{
               console.log(res);
               Toast.fire({
                   icon: 'success',
@@ -120,7 +139,7 @@
               });
             });
           } else {
-            axios.post('/api/users', this.rowSelected).then(res=>{
+            axios.post('/api/products', this.rowSelected).then(res=>{
               console.log(res);
               Toast.fire({
                   icon: 'success',
@@ -137,6 +156,7 @@
           }
         },
         deleteItem(id) {
+          this.dialog = false;
           const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -149,21 +169,51 @@
             }
           });
 
-          axios.delete('/api/users/' + id).then(res=>{
-            console.log(res);
-            Toast.fire({
-                icon: 'success',
-                title: 'Successful removed',
-            });
-            this.dialog = false;
-            this.loadData();
-          }).catch(function (error) {
-            Toast.fire({
-                icon: 'error',
-                title: 'An error has occurred, please try again'
-            });
+          Swal.fire({
+              title: 'Do you want delete product?',
+              showCancelButton: true,
+              confirmButtonText: 'Accept',
+              confirmButtonColor: 'orange',
+              allowOutsideClick: false
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.delete('/api/products/' + id).then(res=>{
+                console.log(res);
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Successful removed',
+                });
+                this.dialog = false;
+                this.loadData();
+              }).catch(function (error) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'An error has occurred, please try again'
+                });
+              });
+            } else if (result.isDenied) {
+              Swal.fire('Canceled order', '', 'info')
+            }
           });
-        }
+        },
+        isNumber: function(evt) {
+          evt = (evt) ? evt : window.event;
+          var charCode = (evt.which) ? evt.which : evt.keyCode;
+          if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
+              evt.preventDefault();
+          } else {
+              return true;
+          }
+        },
+        getImage(e){
+          const image = e.target.files[0];
+          const reader = new FileReader();
+          reader.readAsDataURL(image);
+          reader.onload = e =>{
+              this.previewImage = e.target.result;
+              console.log(this.previewImage);
+          };
+        } 
       },
     }
 </script>
